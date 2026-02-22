@@ -1,0 +1,13 @@
+<footer class="border-t border-white/10 bg-neutral-900  py-12">
+  <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center text-center gap-6">
+    <h2 class="text-2xl font-bold">Rajnish Kumar</h2>
+    <div class="flex gap-6">
+      <a [href]="'https://'+data.personal.linkedin" target="_blank" class="text-neutral-400 hover:text-teal-400 transition-colors">LinkedIn</a>
+      <a [href]="'https://'+data.personal.github" target="_blank" class="text-neutral-400 hover:text-purple-400 transition-colors">GitHub</a>
+      <a [href]="'mailto:'+data.personal.email" class="text-neutral-400 hover:text-teal-400 transition-colors">Email</a>
+    </div>
+    <p class="text-neutral-500 text-sm mt-4">
+      © {{ currentYear }} Rajnish Kumar. Built with Angular & Tailwind CSS.
+    </p>
+  </div>
+</footer>
