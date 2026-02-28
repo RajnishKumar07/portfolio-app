@@ -1,6 +1,6 @@
 <section id="experience" class="py-24 px-6 relative bg-neutral-900/50">
   <div class="max-w-7xl mx-auto">
-    <div class="flex items-center gap-4 mb-24">
+    <div appScrollReveal class="flex items-center gap-4 mb-24 opacity-0 translate-y-8 [&.is-revealed]:opacity-100 [&.is-revealed]:translate-y-0 transition-all duration-1000">
       <div class="h-px bg-gradient-to-r from-transparent to-teal-500/50 flex-1"></div>
       <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Experience</h2>
       <div class="h-px bg-gradient-to-r from-teal-500/50 to-transparent flex-1 w-12 md:w-auto"></div>
@@ -8,8 +8,11 @@
 
     <div class="space-y-24 relative before:absolute before:left-5 md:before:left-1/2 before:-translate-x-1/2 before:h-full before:w-px before:bg-white/10">
       @for (job of data.experience; track $index) {
-        <div class="relative flex flex-col md:flex-row items-center justify-between w-full"
-             [ngClass]="{'md:flex-row-reverse': $index % 2 !== 0}">
+        <div appScrollReveal class="group/card opacity-0 translate-y-12 transition-all duration-1000 relative flex flex-col md:flex-row items-center justify-between w-full [&.is-revealed]:opacity-100 [&.is-revealed]:translate-y-0 [&.is-revealed]:md:translate-x-0"
+             [ngClass]="{
+               'md:flex-row-reverse md:translate-x-12 md:translate-y-0': $index % 2 !== 0,
+               'md:-translate-x-12 md:translate-y-0': $index % 2 === 0
+             }">
           <!-- Timeline Dot -->
           <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-neutral-900 bg-neutral-800 absolute left-5 md:left-1/2 -translate-x-1/2 z-10 group-hover:bg-teal-500 group-hover:border-teal-500/30 transition-colors duration-300">
             <div class="w-2.5 h-2.5 bg-white rounded-full"></div>
@@ -21,9 +24,9 @@
             <div class="bg-white/5 backdrop-blur-sm border border-white/10 p-8 md:p-12 rounded-3xl hover:border-teal-500/50 transition-all duration-300 relative overflow-hidden group-hover:shadow-[0_0_30px_rgba(45,212,191,0.1)] group-hover:-translate-y-1">
               <div class="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl -mr-10 -mt-10 transition-all group-hover:bg-teal-500/10"></div>
               
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-                <h3 class="text-xl font-bold text-white">{{ job.role }}</h3>
-                <span class="text-sm font-medium text-teal-400 bg-teal-400/10 px-3 py-1 rounded-full whitespace-nowrap">{{ job.period }}</span>
+              <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-4">
+                <h3 class="text-lg sm:text-xl font-bold text-white leading-tight">{{ job.role }}</h3>
+                <span class="text-xs sm:text-sm font-medium text-teal-400 bg-teal-400/10 px-3 py-1.5 rounded-full whitespace-nowrap self-start xl:self-auto">{{ job.period }}</span>
               </div>
               
               <div class="text-lg font-medium text-purple-400 mb-4">{{ job.company }} <span class="text-neutral-500 text-sm ml-2">| {{ job.location }}</span></div>
@@ -33,8 +36,9 @@
               }
               
               <ul class="space-y-2 mt-4 relative z-10">
-                @for (point of job.responsibilities; track point) {
-                  <li class="flex items-start text-neutral-400 text-sm leading-relaxed">
+                @for (point of job.responsibilities; track point; let ptIdx = $index) {
+                  <li class="flex items-start text-neutral-400 text-sm leading-relaxed opacity-0 translate-x-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-x-0 transition-all duration-500"
+                      [style.transition-delay]="(ptIdx * 100 + 400) + 'ms'">
                     <svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     <span>{{ point }}</span>
                   </li>
@@ -43,9 +47,9 @@
 
               @if (job.projects) {
                 <div class="mt-6 space-y-4">
-                  <h4 class="text-xs font-bold uppercase tracking-widest text-neutral-500">Key Projects</h4>
-                  @for (project of job.projects; track project.name) {
-                    <div class="bg-black/20 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors">
+                  <h4 class="text-xs font-bold uppercase tracking-widest text-neutral-500 opacity-0 translate-y-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-y-0 transition-all duration-500" [style.transition-delay]="'800ms'">Key Projects</h4>
+                  @for (project of job.projects; track project.name; let pIdx = $index) {
+                    <div class="bg-black/20 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors opacity-0 translate-y-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-y-0 transition-all duration-500" [style.transition-delay]="(pIdx * 150 + 900) + 'ms'">
                       <div class="font-bold text-white mb-1">{{ project.name }}</div>
                       <div class="text-xs text-purple-400 mb-3 font-mono bg-purple-400/10 inline-block px-2 py-0.5 rounded">{{ project.tech }}</div>
                       <ul class="space-y-1.5">

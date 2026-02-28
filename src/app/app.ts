@@ -1,4 +1,5 @@
 import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Header } from './core/layout/header/header';
 import { Footer } from './core/layout/footer/footer';
 import { Hero } from './features/hero/hero';
@@ -12,15 +13,16 @@ import { ScrollRevealDirective } from './shared/directives/scroll-reveal.directi
 @Component({
   selector: 'app-root',
   imports: [
+    CommonModule,
     Header,
-    Footer,
     Hero,
     About,
-    Skills,
     Experience,
+    Skills,
     Projects,
     Education,
-    ScrollRevealDirective
+    Footer,
+    ScrollRevealDirective,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
