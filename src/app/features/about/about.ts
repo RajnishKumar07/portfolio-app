@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RESUME_DATA } from '../../core/data/resume.data';
 import { CountUpDirective } from '../../shared/directives/count-up.directive';
+import { PortfolioData } from '../../core/models/portfolio.model';
 
 @Component({
   selector: 'app-about',
@@ -10,9 +10,10 @@ import { CountUpDirective } from '../../shared/directives/count-up.directive';
   styleUrl: './about.scss'
 })
 export class About {
-  data = RESUME_DATA;
+  data = input.required<PortfolioData>();
 
   getParagraphs(text: string): string[] {
-    return text.split('\\n\\n');
+    return text.split('\n\n');
   }
 }
+

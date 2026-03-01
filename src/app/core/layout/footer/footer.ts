@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RESUME_DATA } from '../../data/resume.data';
+import { PortfolioData } from '../../models/portfolio.model';
 
 @Component({
   selector: 'app-footer',
@@ -9,6 +9,6 @@ import { RESUME_DATA } from '../../data/resume.data';
   styleUrl: './footer.scss',
 })
 export class Footer {
-  data = RESUME_DATA;
+  data = input.required<PortfolioData>();
   currentYear = new Date().getFullYear();
 }

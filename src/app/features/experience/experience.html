@@ -7,7 +7,7 @@
     </div>
 
     <div class="space-y-24 relative before:absolute before:left-5 md:before:left-1/2 before:-translate-x-1/2 before:h-full before:w-px before:bg-white/10">
-      @for (job of data.experience; track $index) {
+      @for (job of data().experiences; track $index) {
         <div appScrollReveal class="group/card opacity-0 translate-y-12 transition-all duration-1000 relative flex flex-col md:flex-row items-center justify-between w-full [&.is-revealed]:opacity-100 [&.is-revealed]:translate-y-0 [&.is-revealed]:md:translate-x-0"
              [ngClass]="{
                'md:flex-row-reverse md:translate-x-12 md:translate-y-0': $index % 2 !== 0,

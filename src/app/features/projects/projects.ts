@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RESUME_DATA } from '../../core/data/resume.data';
 import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
+import { PortfolioData } from '../../core/models/portfolio.model';
 
 @Component({
   selector: 'app-projects',
@@ -10,5 +10,5 @@ import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.dir
   styleUrl: './projects.scss'
 })
 export class Projects {
-  data = RESUME_DATA;
+  data = input.required<PortfolioData>();
 }

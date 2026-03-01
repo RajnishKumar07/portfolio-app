@@ -1,0 +1,45 @@
+@if (portfolioData(); as data) {
+  <app-header [data]="data"></app-header>
+  <main class="relative min-h-screen bg-neutral-900 text-white font-sans w-full">
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div
+        class="absolute top-[10%] left-[-10%] w-96 h-96 bg-purple-600/10 rounded-full blur-[120px]"
+      ></div>
+      <div
+        class="absolute top-[40%] right-[-10%] w-96 h-96 bg-teal-500/10 rounded-full blur-[120px]"
+      ></div>
+      <div
+        class="absolute bottom-[10%] left-[20%] w-[30rem] h-[30rem] bg-indigo-500/5 rounded-full blur-[150px]"
+      ></div>
+    </div>
+
+    <div class="relative z-10 w-full flex flex-col">
+      <div class="block w-full"><app-hero class="block" [data]="data"></app-hero></div>
+      <div class="block w-full" appScrollReveal>
+        <app-about class="block w-full" [data]="data"></app-about>
+      </div>
+      <div class="block w-full">
+        <app-experience class="block w-full" [data]="data"></app-experience>
+      </div>
+      <div class="block w-full" appScrollReveal>
+        <app-skills class="block w-full" [data]="data"></app-skills>
+      </div>
+      <div class="block w-full" appScrollReveal>
+        <app-projects class="block w-full" [data]="data"></app-projects>
+      </div>
+      <div class="block w-full" appScrollReveal>
+        <app-education class="block w-full" [data]="data"></app-education>
+      </div>
+    </div>
+  </main>
+  <app-footer [data]="data"></app-footer>
+} @else {
+  <div class="flex items-center justify-center min-h-screen bg-neutral-900 text-white">
+    <div class="animate-pulse flex flex-col items-center">
+      <div
+        class="w-12 h-12 border-4 border-t-purple-500 border-opacity-50 rounded-full animate-spin"
+      ></div>
+      <p class="mt-4 text-purple-400 font-mono tracking-widest">LOADING PORTFOLIO...</p>
+    </div>
+  </div>
+}

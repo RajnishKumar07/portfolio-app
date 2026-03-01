@@ -1,0 +1,86 @@
+<div class="flex h-screen bg-neutral-950 font-sans text-neutral-300 overflow-hidden">
+  
+  <!-- Sidebar Navigation -->
+  <aside 
+    class="bg-neutral-900 border-r border-white/5 transition-all duration-300 flex flex-col relative z-20"
+    [ngClass]="isSidebarOpen() ? 'w-64' : 'w-20'">
+    
+    <div class="h-16 flex items-center justify-between px-4 border-b border-white/5">
+      @if (isSidebarOpen()) {
+        <span class="text-white font-bold tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-purple-500">
+          PORTFOLIO.IO
+        </span>
+      }
+      <button (click)="toggleSidebar()" class="p-2 hover:bg-white/5 rounded-lg text-neutral-400 hover:text-white transition-colors ml-auto">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex-1 py-4 flex flex-col gap-2 px-3 overflow-y-auto overflow-x-hidden">
+      
+      <!-- Dashboard Links -->
+      <a routerLink="/dashboard" routerLinkActive="bg-white/10 text-white border-l-2 border-teal-500" [routerLinkActiveOptions]="{exact: true}"
+         class="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-white/5 hover:text-white transition-all text-sm font-medium border-l-2 border-transparent">
+        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+        @if (isSidebarOpen()) { <span>Overview</span> }
+      </a>
+
+      <!-- Other sections will be routed to here as child components later -->
+      <div class="mt-4 mb-2 px-3 text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+        @if (isSidebarOpen()) { Editor Panels }
+      </div>
+
+    </nav>
+
+    <!-- User Section -->
+    <div class="p-4 border-t border-white/5">
+      <div class="flex items-center gap-3 w-full">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold shrink-0 shadow-lg border border-white/10">
+          {{ authService.currentUser()?.email?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+        @if (isSidebarOpen()) {
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-white truncate">{{ authService.currentUser()?.email }}</p>
+            <p class="text-xs text-neutral-500 truncate">Administrator</p>
+          </div>
+          <button (click)="logout()" class="p-2 text-neutral-500 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors" title="Log Out">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area where child routes or internal forms are mounted -->
+  <main class="flex-1 flex flex-col min-w-0 bg-neutral-950 relative overflow-hidden">
+    <!-- Subtle Background Elements -->
+    <div class="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <header class="h-16 flex items-center px-8 border-b border-white/5 bg-neutral-900/50 backdrop-blur-md relative z-10 justify-between">
+      <h1 class="text-lg font-bold text-white tracking-wide">Builder Dashboard</h1>
+      <div class="flex gap-4">
+        <a routerLink="/" target="_blank" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2">
+          View Live Site
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+       <!-- Dashboard Content (Placeholder for multi-step form) -->
+       <div class="max-w-5xl mx-auto">
+         <div class="bg-white/5 border border-white/10 rounded-2xl p-8 mb-8">
+            <h2 class="text-2xl font-bold text-white mb-2">Welcome to your Portfolio Editor</h2>
+            <p class="text-neutral-400">Use the panels to dynamically adjust the JSON payload sent to your NestJS backend.</p>
+         </div>
+
+         <!-- Temporary placeholder until we build the FormArray UI -->
+         <router-outlet></router-outlet>
+       </div>
+    </div>
+  </main>
+
+</div>

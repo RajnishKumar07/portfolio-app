@@ -1,0 +1,31 @@
+# Full-Stack Portfolio Builder
+
+## Goal Overview
+Transition the currently static Angular portfolio into a fully dynamic, multi-tenant platform. The system will use a NestJS + TypeORM + MySQL backend. Visitors will be able to view the primary portfolio, but also click a "Create your own" button to generate, edit, and share their own custom portfolios via unique URLs.
+
+## Core Requirements
+
+### 1. Backend Architecture (NestJS + MySQL)
+- Initialize a NestJS application.
+- Configure TypeORM with a MySQL database.
+- Design a normalized database schema to store Users, Personal Info, Experience, Education, Projects, and Skills.
+
+### 2. Dynamic Frontend Loading
+- Remove the hardcoded [resume.data.ts](file:///e:/PROJECT/portfolio-app/src/app/core/data/resume.data.ts) dependency.
+- Create Angular services to fetch portfolio data from the NestJS REST API using a unique portfolio ID (or default to the owner's ID for the main domain).
+
+### 3. Portfolio Creation UI (The Builder)
+- Add a "Create Your Portfolio" Call-to-Action button on the main site.
+- Build a multi-step form (or comprehensive single-page dashboard) for users to input their data.
+- Handle validation (required vs. optional fields).
+
+### 4. Authentication & Editing
+- Implement a mechanism for users to return and edit their data (e.g., simple JWT auth or password-protected edit links).
+- Generate a unique, shareable link (e.g., `yourdomain.com/p/unique-id` or username-based routing) for newly created portfolios.
+
+## Next Steps
+1. **Approval**: Confirm this architecture and scope with the user.
+2. **Backend Setup**: Scaffold the NestJS application and define the core database entities.
+3. **API Development**: Create the CRUD endpoints for portfolio data.
+4. **Frontend Integration**: Refactor the Angular app to consume these APIs.
+5. **Builder Development**: Create the forms and routing for new user onboarding.

@@ -1,6 +1,6 @@
-import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal } from '@angular/core';
+import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal, input } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RESUME_DATA } from '../../core/data/resume.data';
+import { PortfolioData } from '../../core/models/portfolio.model';
 
 @Component({
   selector: 'app-hero',
@@ -9,7 +9,7 @@ import { RESUME_DATA } from '../../core/data/resume.data';
   styleUrl: './hero.scss'
 })
 export class Hero implements OnInit {
-  data = RESUME_DATA;
+  data = input.required<PortfolioData>();
   isBrowser = false;
   displayTitle = signal('');
   fullTitle = 'Senior Software Engineer';

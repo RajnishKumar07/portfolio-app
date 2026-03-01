@@ -6,17 +6,17 @@
     </div>
 
     <div class="space-y-16">
-      @for (category of data.skills; track category.category; let idx = $index) {
+      @for (category of data().skills; track category.category; let idx = $index) {
         <div appScrollReveal class="group/card opacity-0 translate-y-12 [&.is-revealed]:opacity-100 [&.is-revealed]:translate-y-0 transition-all duration-1000 hover:duration-500 bg-white/5 border border-white/10 rounded-3xl p-8 md:p-10 backdrop-blur-sm relative overflow-hidden group"
              [style.transition-delay]="(idx * 200 + 200) + 'ms'"
-             [ngClass]="'hover:border-' + category.colorClass + '-500/30'">
+             [ngClass]="'hover:border-' + (category.colorClass || 'purple') + '-500/30'">
           <div class="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-10 -mt-10 transition-all"
-               [ngClass]="'bg-' + category.colorClass + '-500/10 group-hover:bg-' + category.colorClass + '-500/20'"></div>
+               [ngClass]="'bg-' + (category.colorClass || 'purple') + '-500/10 group-hover:bg-' + (category.colorClass || 'purple') + '-500/20'"></div>
           <h3 class="flex items-center text-xl font-bold text-white mb-6">
             <span class="w-8 h-8 rounded-lg flex items-center justify-center mr-3"
-                  [ngClass]="'bg-' + category.colorClass + '-500/20 text-' + category.colorClass + '-400'">
+                  [ngClass]="'bg-' + (category.colorClass || 'purple') + '-500/20 text-' + (category.colorClass || 'purple') + '-400'">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                @for (path of category.iconUrl.split('|'); track path) {
+                @for (path of (category.iconUrl || 'M13 10V3L4 14h7v7l9-11h-7z').split('|'); track path) {
                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="path"></path>
                 }
               </svg>

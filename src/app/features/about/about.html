@@ -28,7 +28,7 @@
         </div>
         
         <div class="space-y-6 pl-4 border-l-2 border-white/10 ml-1 text-neutral-400">
-          @for (paragraph of getParagraphs(data.personal.summary); track $index) {
+          @for (paragraph of getParagraphs(data().personalInfo.about); track $index) {
             <p>{{ paragraph }}</p>
           }
         </div>
@@ -42,7 +42,7 @@
     
     <!-- Metric Cards Below Terminal -->
     <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
-      @for (metric of data.metrics; track metric.label; let idx = $index) {
+      @for (metric of data().metrics; track metric.label; let idx = $index) {
         <div class="opacity-0 translate-y-8 group-[.is-revealed]/reveal:opacity-100 group-[.is-revealed]/reveal:translate-y-0 transition-all duration-1000 bg-white/5 border border-white/10 rounded-xl p-8 text-center hover:bg-white/10"
              [style.transition-delay]="(idx * 150 + 300) + 'ms'">
           <div class="text-3xl font-black text-white" [appCountUp]="metric.value" [suffix]="metric.suffix" [delay]="idx * 150 + 300">{{ metric.value }}{{ metric.suffix }}</div>
