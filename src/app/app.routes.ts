@@ -13,7 +13,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard').then(m => m.DashboardComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent) }
+      { path: '', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent) },
+      { path: 'edit/:slug', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent) }
     ]
   },
   { path: 'p/:slug', component: HomeComponent }

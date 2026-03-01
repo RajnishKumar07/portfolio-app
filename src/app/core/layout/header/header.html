@@ -11,15 +11,15 @@
     </a>
     
     <nav class="hidden md:flex gap-8">
-      <a href="#about" class="text-sm font-medium transition-colors uppercase tracking-widest"
+      <a (click)="scrollTo('about')" class="cursor-pointer text-sm font-medium transition-colors uppercase tracking-widest"
          [ngClass]="activeSection() === 'about' ? 'text-white' : 'text-neutral-400 hover:text-white'">About</a>
-      <a href="#experience" class="text-sm font-medium transition-colors uppercase tracking-widest"
+      <a (click)="scrollTo('experience')" class="cursor-pointer text-sm font-medium transition-colors uppercase tracking-widest"
          [ngClass]="activeSection() === 'experience' ? 'text-white' : 'text-neutral-400 hover:text-white'">Experience</a>
-      <a href="#skills" class="text-sm font-medium transition-colors uppercase tracking-widest"
+      <a (click)="scrollTo('skills')" class="cursor-pointer text-sm font-medium transition-colors uppercase tracking-widest"
          [ngClass]="activeSection() === 'skills' ? 'text-white' : 'text-neutral-400 hover:text-white'">Skills</a>
-      <a href="#projects" class="text-sm font-medium transition-colors uppercase tracking-widest"
+      <a (click)="scrollTo('projects')" class="cursor-pointer text-sm font-medium transition-colors uppercase tracking-widest"
          [ngClass]="activeSection() === 'projects' ? 'text-white' : 'text-neutral-400 hover:text-white'">Projects</a>
-      <a href="#education" class="text-sm font-medium transition-colors uppercase tracking-widest"
+      <a (click)="scrollTo('education')" class="cursor-pointer text-sm font-medium transition-colors uppercase tracking-widest"
          [ngClass]="activeSection() === 'education' ? 'text-white' : 'text-neutral-400 hover:text-white'">Education</a>
     </nav>
     

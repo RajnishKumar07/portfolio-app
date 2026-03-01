@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../../../services/portfolio.service';
 
 @Component({
@@ -17,14 +18,31 @@ export class PortfolioFormComponent implements OnInit {
 
   currentStep = signal(1);
   totalSteps = 6;
+  editSlug: string | null = null;
+  isLoading = signal(false);
 
   constructor(
     private fb: FormBuilder,
-    private portfolioService: PortfolioService
+    private portfolioService: PortfolioService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.initForm();
+    
+    this.route.paramMap.subscribe(params => {
+      this.editSlug = params.get('slug');
+      if (this.editSlug) {
+        this.loadPortfolio(this.editSlug);
+      } else {
+        // Add at least one empty item to each array by default so the UI isn't totally blank
+        this.addExperience();
+        this.addEducation();
+        this.addProject();
+        this.addSkillCategory();
+      }
+    });
   }
 
   initForm() {
@@ -34,6 +52,8 @@ export class PortfolioFormComponent implements OnInit {
       personalInfo: this.fb.group({
         name: ['', Validators.required],
         title: ['', Validators.required],
+        role: [''],
+        tagline: [''],
         about: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         phone: [''],
@@ -46,12 +66,47 @@ export class PortfolioFormComponent implements OnInit {
       projects: this.fb.array([]),
       skills: this.fb.array([])
     });
+  }
 
-    // Add at least one empty item to each array by default so the UI isn't totally blank
-    this.addExperience();
-    this.addEducation();
-    this.addProject();
-    this.addSkillCategory();
+  loadPortfolio(slug: string) {
+    this.isLoading.set(true);
+    this.portfolioService.getPortfolio(slug).subscribe({
+      next: (data) => {
+        // Clear default arrays before patching
+        while (this.experiences.length !== 0) this.experiences.removeAt(0);
+        while (this.educations.length !== 0) this.educations.removeAt(0);
+        while (this.projects.length !== 0) this.projects.removeAt(0);
+        while (this.skills.length !== 0) this.skills.removeAt(0);
+
+        // Prep arrays
+        if (data.experiences) data.experiences.forEach(() => this.addExperience());
+        if (data.educations) data.educations.forEach(() => this.addEducation());
+        if (data.projects) {
+          data.projects.forEach((p: any) => {
+            p.tagsInput = p.tags ? p.tags.join(', ') : '';
+            this.addProject();
+          });
+        }
+        if (data.skills) {
+          data.skills.forEach((s: any) => {
+            s.itemsInput = s.items ? s.items.join(', ') : '';
+            this.addSkillCategory();
+          });
+        }
+
+        // Disable slug field in edit mode
+        if (this.editSlug) {
+            this.portfolioForm.get('slug')?.disable();
+        }
+
+        this.portfolioForm.patchValue(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.errorMessage.set('Failed to load portfolio for editing.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   // --- Getters for Form Arrays ---
@@ -85,7 +140,6 @@ export class PortfolioFormComponent implements OnInit {
       description: ['', Validators.required],
       link: [''],
       imagePath: [''],
-      // We will handle tags as a comma separated string in UI and split it before sending
       tagsInput: ['', Validators.required]
     }));
   }
@@ -93,7 +147,6 @@ export class PortfolioFormComponent implements OnInit {
   addSkillCategory() {
     this.skills.push(this.fb.group({
       category: ['', Validators.required],
-      // Handled as a comma separated string
       itemsInput: ['', Validators.required] 
     }));
   }
@@ -120,7 +173,6 @@ export class PortfolioFormComponent implements OnInit {
   onSubmit() {
     if (this.portfolioForm.invalid) {
       this.errorMessage.set('Please fill out all required fields marked with *');
-      // Briefly show error then fade out
       setTimeout(() => this.errorMessage.set(''), 5000);
       return;
     }
@@ -129,8 +181,8 @@ export class PortfolioFormComponent implements OnInit {
     this.errorMessage.set('');
     this.saveSuccess.set(false);
 
-    // Deep clone the form value to format the comma-separated strings into actual arrays as required by our NestJS DTOs
-    const payload = JSON.parse(JSON.stringify(this.portfolioForm.value));
+    // Deep clone and use getRawValue to include disabled fields (like slug)
+    const payload = JSON.parse(JSON.stringify(this.portfolioForm.getRawValue()));
     
     // Transform Project Tags
     payload.projects = payload.projects.map((p: any) => ({
@@ -147,11 +199,18 @@ export class PortfolioFormComponent implements OnInit {
       items: s.itemsInput ? s.itemsInput.split(',').map((i: string) => i.trim()) : []
     }));
 
-    this.portfolioService.createPortfolio(payload).subscribe({
+    const saveObs = this.editSlug 
+        ? this.portfolioService.updatePortfolio(this.editSlug, payload)
+        : this.portfolioService.createPortfolio(payload);
+
+    saveObs.subscribe({
       next: (res) => {
         this.isSaving.set(false);
         this.saveSuccess.set(true);
         setTimeout(() => this.saveSuccess.set(false), 3000);
+        if (!this.editSlug && res.slug) {
+            this.router.navigate(['/dashboard/edit', res.slug]);
+        }
       },
       error: (err) => {
         this.isSaving.set(false);

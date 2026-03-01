@@ -12,7 +12,7 @@ export class Hero implements OnInit {
   data = input.required<PortfolioData>();
   isBrowser = false;
   displayTitle = signal('');
-  fullTitle = 'Senior Software Engineer';
+  fullTitle = '';
   scrolled = false;
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
@@ -26,6 +26,11 @@ export class Hero implements OnInit {
   
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    // Dynamically set title from the API data instead of a static string
+    const info = this.data().personalInfo;
+    this.fullTitle = info.role || (info.title.includes(' | ') ? info.title.split(' | ')[0] : info.title);
+    
     if (this.isBrowser) {
         let i = 0;
         const speed = 100;
@@ -39,6 +44,12 @@ export class Hero implements OnInit {
         setTimeout(typeWriter, 500); // initial delay
     } else {
         this.displayTitle.set(this.fullTitle);
+    }
+  }
+
+  scrollTo(sectionId: string) {
+    if (this.isBrowser) {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 }

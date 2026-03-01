@@ -25,14 +25,20 @@
       <a routerLink="/dashboard" routerLinkActive="bg-white/10 text-white border-l-2 border-teal-500" [routerLinkActiveOptions]="{exact: true}"
          class="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-white/5 hover:text-white transition-all text-sm font-medium border-l-2 border-transparent">
         <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-        @if (isSidebarOpen()) { <span>Overview</span> }
+        @if (isSidebarOpen()) { <span>Create New</span> }
       </a>
 
-      <!-- Other sections will be routed to here as child components later -->
       <div class="mt-4 mb-2 px-3 text-xs font-semibold text-neutral-600 uppercase tracking-wider">
-        @if (isSidebarOpen()) { Editor Panels }
+        @if (isSidebarOpen()) { Your Portfolios }
       </div>
-
+      
+      @for (port of userPortfolios(); track port.id) {
+        <a [routerLink]="['/dashboard/edit', port.slug]" routerLinkActive="bg-white/10 text-white border-l-2 border-purple-500"
+           class="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-white/5 hover:text-white transition-all text-sm font-medium border-l-2 border-transparent">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          @if (isSidebarOpen()) { <span class="truncate">Edit {{ port.slug }}</span> }
+        </a>
+      }
     </nav>
 
     <!-- User Section -->
