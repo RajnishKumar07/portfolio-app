@@ -68,7 +68,10 @@
     <header class="h-16 flex items-center px-8 border-b border-white/5 bg-neutral-900/50 backdrop-blur-md relative z-10 justify-between">
       <h1 class="text-lg font-bold text-white tracking-wide">Builder Dashboard</h1>
       <div class="flex gap-4">
-        <a routerLink="/" target="_blank" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2">
+        <a [routerLink]="activeSlug() ? ['/p', activeSlug()] : null" 
+           [class.opacity-50]="!activeSlug()"
+           [class.cursor-not-allowed]="!activeSlug()"
+           target="_blank" class="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2">
           View Live Site
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
         </a>
@@ -80,7 +83,7 @@
        <div class="max-w-5xl mx-auto">
          <div class="bg-white/5 border border-white/10 rounded-2xl p-8 mb-8">
             <h2 class="text-2xl font-bold text-white mb-2">Welcome to your Portfolio Editor</h2>
-            <p class="text-neutral-400">Use the panels to dynamically adjust the JSON payload sent to your NestJS backend.</p>
+            <p class="text-neutral-400">Navigate through the sections below to build and customize your portfolio profile.</p>
          </div>
 
          <!-- Temporary placeholder until we build the FormArray UI -->

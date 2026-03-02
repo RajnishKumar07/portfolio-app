@@ -1,7 +1,7 @@
 <div class="w-full h-full relative">
 <!-- Stepper Header -->
   <div class="flex items-center justify-between mb-8 overflow-x-auto pb-4 scrollbar-none border-b border-white/5">
-    @for (step of ['Settings', 'Personal', 'Experience', 'Education', 'Projects', 'Skills']; track step; let idx = $index) {
+    @for (step of ['Settings', 'Personal', 'Experience', 'Education', 'Projects', 'Skills', 'Certifications']; track step; let idx = $index) {
       <div class="flex flex-col items-center gap-2 relative px-4 flex-shrink-0 cursor-pointer" 
            (click)="currentStep.set(idx + 1)"
            [ngClass]="currentStep() === idx + 1 ? 'text-teal-400' : (currentStep() > idx + 1 ? 'text-white' : 'text-neutral-600')">
@@ -64,7 +64,7 @@
               <input id="isPublic" type="checkbox" formControlName="isPublic" class="w-5 h-5 text-teal-500 bg-neutral-800 border-neutral-700 rounded focus:ring-teal-500 focus:ring-2">
               <label for="isPublic" class="ml-3 block text-sm font-medium text-white">
                 Publicly Accessible
-                <p class="text-neutral-400 font-normal mt-0.5">Toggle this off to hide your portfolio from everyone but yourself while editing.</p>
+                <p class="text-neutral-400 font-normal mt-0.5">When disabled, this portfolio is only visible to you.</p>
               </label>
             </div>
           </div>
@@ -80,18 +80,33 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2 text-xl font-bold pt-2 border-t border-white/5">Header Info</div>
             <div>
               <label class="block text-sm font-medium text-neutral-300 mb-2">Full Name *</label>
-              <input type="text" formControlName="name" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+              <input type="text" formControlName="name" placeholder="John Doe" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-300 mb-2">Location</label>
+              <input type="text" formControlName="location" placeholder="San Francisco, CA" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-sm font-medium text-neutral-300 mb-2">Job Title *</label>
               <input type="text" formControlName="title" placeholder="e.g. Senior Software Engineer" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
             </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-300 mb-2">Tagline Focus</label>
+              <input type="text" formControlName="tagline" placeholder="e.g. Architecting High-Performance Web Apps" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-neutral-300 mb-2">Functional Role (Optional)</label>
+              <input type="text" formControlName="role" placeholder="e.g. Fullstack Developer" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+            </div>
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-neutral-300 mb-2">Professional Summary *</label>
-              <textarea formControlName="about" rows="4" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none"></textarea>
+              <textarea formControlName="about" rows="4" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none scrollbar-custom"></textarea>
             </div>
+            
+            <div class="md:col-span-2 text-xl font-bold pt-4 border-t border-white/5">Contact Links</div>
             <div>
               <label class="block text-sm font-medium text-neutral-300 mb-2">Contact Email *</label>
               <input type="email" formControlName="email" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
@@ -107,6 +122,26 @@
              <div>
               <label class="block text-sm font-medium text-neutral-300 mb-2">LinkedIn URL</label>
               <input type="text" formControlName="linkedinUrl" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-white/5" [formGroup]="portfolioForm">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <label class="block text-sm font-medium text-neutral-300">Languages Spoken</label>
+                <p class="text-xs text-neutral-500 mt-1">Add languages one by one.</p>
+              </div>
+              <button type="button" (click)="addLanguage()" class="text-xs font-bold px-3 py-1.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded-lg transition-colors">+ Add Language</button>
+            </div>
+            <div formArrayName="languages" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              @for (langCtrl of languages.controls; track langCtrl; let i = $index) {
+                <div class="flex gap-2 relative">
+                  <input type="text" [formControlName]="i" placeholder="e.g. English" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:border-teal-500 focus:outline-none">
+                  <button type="button" (click)="removeLanguage(i)" class="p-2.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -127,7 +162,7 @@
           </div>
 
           @for (expCtrl of experiences.controls; track expCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group">
+            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
               <button type="button" (click)="removeExperience(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
@@ -145,9 +180,86 @@
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Time Period *</label>
                   <input type="text" formControlName="period" placeholder="e.g. Jan 2022 - Present" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
                 </div>
+                 <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Location</label>
+                  <input type="text" formControlName="location" placeholder="e.g. Remote, San Francisco, CA" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                </div>
                 <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Description/Impact *</label>
-                  <textarea formControlName="description" rows="3" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none"></textarea>
+                  <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none scrollbar-custom"></textarea>
+                </div>
+                
+                <div class="md:col-span-2 mt-2 p-4 bg-neutral-900/50 rounded-xl border border-white/5">
+                  <div class="flex items-center justify-between mb-3">
+                    <label class="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">Key Responsibilities</label>
+                    <button type="button" (click)="addExperienceResponsibility(i)" class="text-[11px] font-bold px-2 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Bullet</button>
+                  </div>
+                  <div formArrayName="responsibilities" class="space-y-2">
+                    @for (respCtrl of $any(expCtrl.get('responsibilities')).controls; track respCtrl; let rIdx = $index) {
+                      <div class="flex items-center gap-2">
+                        <div class="text-neutral-500">•</div>
+                        <input type="text" [formControlName]="rIdx" placeholder="e.g. Led team of 5" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
+                        <button type="button" (click)="removeExperienceResponsibility(i, rIdx)" class="p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Experience Projects -->
+                <div class="md:col-span-2 mt-2 p-4 bg-neutral-900/50 rounded-xl border border-white/5">
+                  <div class="flex items-center justify-between mb-3">
+                    <label class="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">Notable Projects (Optional)</label>
+                    <button type="button" (click)="addExpProject(i)" class="text-[11px] font-bold px-2 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Project</button>
+                  </div>
+                  <div formArrayName="projects" class="space-y-4">
+                    @for (epCtrl of $any(expCtrl.get('projects')).controls; track epCtrl; let epIdx = $index) {
+                      <div [formGroupName]="epIdx" class="bg-black/40 border border-white/10 rounded-lg p-4 relative">
+                        <button type="button" (click)="removeExpProject(i, epIdx)" class="absolute top-2 right-2 p-1 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                          <div>
+                            <input type="text" formControlName="name" placeholder="Project Name" class="w-full bg-neutral-900 border border-white/10 rounded px-3 py-1.5 text-white text-sm focus:border-teal-500 focus:outline-none">
+                          </div>
+                          <div>
+                            <input type="text" formControlName="tech" placeholder="Tech Stack (e.g. Node, React)" class="w-full bg-neutral-900 border border-white/10 rounded px-3 py-1.5 text-white text-sm focus:border-teal-500 focus:outline-none">
+                          </div>
+                        </div>
+                        <div formArrayName="points" class="space-y-2 mt-2 pl-2 border-l-2 border-white/5">
+                          <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] text-neutral-500 uppercase tracking-wider">Bullet Points</span>
+                            <button type="button" (click)="addExpProjectPoint(i, epIdx)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 rounded transition-colors">+ Add Point</button>
+                          </div>
+                          @for (ptCtrl of $any(epCtrl.get('points')).controls; track ptCtrl; let ptIdx = $index) {
+                            <div class="flex items-center gap-2">
+                              <span class="text-neutral-600">-</span>
+                              <input type="text" [formControlName]="ptIdx" placeholder="Point details" class="flex-1 bg-neutral-900 border border-white/10 rounded px-2 py-1 text-white text-xs focus:border-teal-500 focus:outline-none">
+                              <button type="button" (click)="removeExpProjectPoint(i, epIdx, ptIdx)" class="p-1 text-neutral-500 hover:text-red-400 bg-white/5 rounded"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Recognition -->
+                <div class="md:col-span-2 mt-2 p-4 bg-gradient-to-r from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-xl" formGroupName="recognition">
+                  <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L5.237 7.58l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 014 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L8 4.323V3a1 1 0 011-1zm-5.16 10.613l-.841 2.623a2.001 2.001 0 001.83 2.764 2.001 2.001 0 001.83-2.764l-.84-2.623a.999.999 0 01-1.979 0zM14.16 12.613l-.841 2.623a2.001 2.001 0 001.83 2.764 2.001 2.001 0 001.83-2.764l-.84-2.623a.999.999 0 01-1.979 0z" clip-rule="evenodd"></path></svg>
+                    <label class="block text-xs font-semibold text-amber-500 uppercase tracking-wider">Awards / Recognition (Optional)</label>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <input type="text" formControlName="title" placeholder="Award Title (e.g. Employee of the Month)" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div>
+                      <input type="text" formControlName="date" placeholder="Date (e.g. Sep 2023)" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                    </div>
+                    <div class="md:col-span-2">
+                      <input type="text" formControlName="description" placeholder="Brief description of the recognition..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,7 +281,7 @@
           </div>
 
           @for (eduCtrl of educations.controls; track eduCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group">
+            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
               <button type="button" (click)="removeEducation(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
@@ -189,7 +301,7 @@
                 </div>
                 <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Extracurriculars/Description *</label>
-                  <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none"></textarea>
+                  <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none scrollbar-custom"></textarea>
                 </div>
               </div>
             </div>
@@ -211,8 +323,8 @@
           </div>
 
           @for (projCtrl of projects.controls; track projCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group">
-              <button type="button" (click)="removeProject(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
+              <button type="button" (click)="removeProject(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 z-10">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
               
@@ -221,18 +333,76 @@
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Project Title *</label>
                   <input type="text" formControlName="title" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
                 </div>
+                <div>
+                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Role</label>
+                  <input type="text" formControlName="role" placeholder="e.g. Lead Developer" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Time Period</label>
+                  <input type="text" formControlName="period" placeholder="e.g. Jan 2023 - Present" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                </div>
                  <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Description *</label>
-                  <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none"></textarea>
+                  <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none scrollbar-custom"></textarea>
                 </div>
-                <div>
+                
+                <!-- Project Features Array -->
+                <div class="md:col-span-2 bg-neutral-900/40 p-3 rounded-xl border border-white/5">
+                  <div class="flex items-center justify-between mb-2">
+                    <label class="block text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">Key Features</label>
+                    <button type="button" (click)="addProjectFeature(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Feature</button>
+                  </div>
+                  <div formArrayName="features" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    @for (featCtrl of $any(projCtrl.get('features')).controls; track featCtrl; let featIdx = $index) {
+                      <div class="flex gap-1.5">
+                        <input type="text" [formControlName]="featIdx" placeholder="e.g. Real-time chat" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                        <button type="button" (click)="removeProjectFeature(i, featIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Project Tech Stack Array -->
+                <div class="bg-neutral-900/40 p-3 rounded-xl border border-white/5">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">Tech Stack Tags</label>
+                    <button type="button" (click)="addProjectTech(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Tech</button>
+                  </div>
+                  <p class="text-[10px] text-neutral-500 mb-3 leading-tight">Tools & languages used (e.g., Angular, Node.js).</p>
+                  <div formArrayName="techStack" class="space-y-1.5">
+                    @for (techCtrl of $any(projCtrl.get('techStack')).controls; track techCtrl; let techIdx = $index) {
+                      <div class="flex gap-1.5">
+                        <input type="text" [formControlName]="techIdx" placeholder="React" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                        <button type="button" (click)="removeProjectTech(i, techIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Project Display Tags Array -->
+                <div class="bg-neutral-900/40 p-3 rounded-xl border border-white/5">
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">Display Tags</label>
+                    <button type="button" (click)="addProjectTag(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Tag</button>
+                  </div>
+                  <p class="text-[10px] text-neutral-500 mb-3 leading-tight">Context labels for the project (e.g., Open Source, Featured).</p>
+                  <div formArrayName="tags" class="space-y-1.5">
+                    @for (tagCtrl of $any(projCtrl.get('tags')).controls; track tagCtrl; let tagIdx = $index) {
+                      <div class="flex gap-1.5">
+                        <input type="text" [formControlName]="tagIdx" placeholder="Featured" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                        <button type="button" (click)="removeProjectTag(i, tagIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Thumbnail Image (URL)</label>
+                  <input type="text" formControlName="imagePath" placeholder="https://..." class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                </div>
+                <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Live Link (Optional)</label>
-                  <input type="text" formControlName="link" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Tech Stack Tags *</label>
-                  <input type="text" formControlName="tagsInput" placeholder="React, Node.js, Express" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
-                  <p class="text-[10px] text-neutral-500 mt-1">Comma separated list of technologies</p>
+                  <input type="text" formControlName="link" placeholder="https://myapp.com" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
                 </div>
               </div>
             </div>
@@ -257,7 +427,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             @for (skillCtrl of skills.controls; track skillCtrl; let i = $index) {
               <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 relative group">
-                <button type="button" (click)="removeSkillCategory(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                <button type="button" (click)="removeSkillCategory(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100 z-10">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 
@@ -266,10 +436,55 @@
                     <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Category Name *</label>
                     <input type="text" formControlName="category" placeholder="e.g. Frontend Development" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
                   </div>
+                  <div class="bg-neutral-900/30 p-3 rounded-lg border border-white/5">
+                    <div class="flex items-center justify-between mb-2">
+                      <label class="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">Items</label>
+                      <button type="button" (click)="addSkillItem(i)" class="text-[10px] font-bold px-2 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Item</button>
+                    </div>
+                    <div formArrayName="items" class="flex flex-wrap gap-2">
+                      @for (itemCtrl of $any(skillCtrl.get('items')).controls; track itemCtrl; let itemIdx = $index) {
+                        <div class="flex items-center gap-1 bg-black/60 border border-white/10 rounded-full pl-3 pr-1 py-1">
+                          <input type="text" [formControlName]="itemIdx" placeholder="Skill" class="w-20 sm:w-24 bg-transparent text-white text-xs focus:outline-none">
+                          <button type="button" (click)="removeSkillItem(i, itemIdx)" class="p-1 text-neutral-400 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      <!-- STEP 7: Certifications -->
+      @if (currentStep() === 7) {
+        <div class="space-y-6 animate-fade-in" formArrayName="certifications">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-xl font-bold text-white mb-1">Certifications</h3>
+              <p class="text-neutral-400 text-sm">Add your professional certifications and awards.</p>
+            </div>
+            <button type="button" (click)="addCertification()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Add Certification
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @for (certCtrl of certifications.controls; track certCtrl; let i = $index) {
+              <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 relative group">
+                <button type="button" (click)="removeCertification(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                
+                <div class="space-y-4">
                   <div>
-                    <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Skills *</label>
-                    <textarea formControlName="itemsInput" placeholder="React, Angular, Vue" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none"></textarea>
-                    <p class="text-[10px] text-neutral-500 mt-1">Comma separated</p>
+                    <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Certification Title *</label>
+                    <input type="text" formControlName="title" placeholder="e.g. AWS Certified Solutions Architect" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Credential URL *</label>
+                    <input type="text" formControlName="url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
                   </div>
                 </div>
               </div>

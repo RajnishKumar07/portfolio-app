@@ -1,10 +1,19 @@
 <footer class="border-t border-white/10 bg-neutral-900  py-12">
   <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center text-center gap-6">
     <h2 class="text-2xl font-bold">{{ data().personalInfo.name }}</h2>
-    <div class="flex gap-6 mt-4 md:mt-0">
-      <a [href]="'https://'+data().personalInfo.linkedinUrl" target="_blank" class="text-neutral-400 hover:text-teal-400 transition-colors">LinkedIn</a>
-      <a [href]="'https://'+data().personalInfo.githubUrl" target="_blank" class="text-neutral-400 hover:text-purple-400 transition-colors">GitHub</a>
-      <a [href]="'mailto:'+data().personalInfo.email" class="text-neutral-400 hover:text-teal-400 transition-colors">Email</a>
+    <div class="flex flex-wrap justify-center gap-4 md:gap-6 mt-4 md:mt-0">
+      @if (data().personalInfo.linkedinUrl) {
+        <a [href]="data().personalInfo.linkedinUrl!.startsWith('http') ? data().personalInfo.linkedinUrl : 'https://'+data().personalInfo.linkedinUrl" target="_blank" class="text-neutral-400 hover:text-teal-400 transition-colors">LinkedIn</a>
+      }
+      @if (data().personalInfo.githubUrl) {
+        <a [href]="data().personalInfo.githubUrl!.startsWith('http') ? data().personalInfo.githubUrl : 'https://'+data().personalInfo.githubUrl" target="_blank" class="text-neutral-400 hover:text-purple-400 transition-colors">GitHub</a>
+      }
+      @if (data().personalInfo.email) {
+        <a [href]="'mailto:'+data().personalInfo.email" class="text-neutral-400 hover:text-teal-400 transition-colors">Email</a>
+      }
+      @if (data().personalInfo.phone) {
+        <a [href]="'tel:'+data().personalInfo.phone" class="text-neutral-400 hover:text-teal-400 transition-colors">Phone</a>
+      }
     </div>
   </div>
   <div class="mt-12 text-center text-sm text-neutral-500 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center max-w-7xl mx-auto px-6 gap-4">

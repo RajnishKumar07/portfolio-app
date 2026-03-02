@@ -26,26 +26,30 @@
               
               <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 mb-4">
                 <h3 class="text-lg sm:text-xl font-bold text-white leading-tight">{{ job.role }}</h3>
-                <span class="text-xs sm:text-sm font-medium text-teal-400 bg-teal-400/10 px-3 py-1.5 rounded-full whitespace-nowrap self-start xl:self-auto">{{ job.period }}</span>
+                @if (job.period) {
+                  <span class="text-xs sm:text-sm font-medium text-teal-400 bg-teal-400/10 px-3 py-1.5 rounded-full whitespace-nowrap self-start xl:self-auto">{{ job.period }}</span>
+                }
               </div>
               
-              <div class="text-lg font-medium text-purple-400 mb-4">{{ job.company }} <span class="text-neutral-500 text-sm ml-2">| {{ job.location }}</span></div>
+              <div class="text-lg font-medium text-purple-400 mb-4">{{ job.company }} <span class="text-neutral-500 text-sm ml-2">@if (job.location) { | {{ job.location }} }</span></div>
               
               @if (job.description) {
                 <p class="text-neutral-300 mb-4 font-medium whitespace-pre-line border-l-2 border-purple-500/50 pl-3">{{ job.description }}</p>
               }
               
-              <ul class="space-y-2 mt-4 relative z-10">
-                @for (point of job.responsibilities; track point; let ptIdx = $index) {
-                  <li class="flex items-start text-neutral-400 text-sm leading-relaxed opacity-0 translate-x-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-x-0 transition-all duration-500"
-                      [style.transition-delay]="(ptIdx * 100 + 400) + 'ms'">
-                    <svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    <span>{{ point }}</span>
-                  </li>
-                }
-              </ul>
+              @if (job.responsibilities && job.responsibilities.length > 0) {
+                <ul class="space-y-2 mt-4 relative z-10">
+                  @for (point of job.responsibilities; track point; let ptIdx = $index) {
+                    <li class="flex items-start text-neutral-400 text-sm leading-relaxed opacity-0 translate-x-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-x-0 transition-all duration-500"
+                        [style.transition-delay]="(ptIdx * 100 + 400) + 'ms'">
+                      <svg class="w-5 h-5 text-teal-500 mr-2 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                      <span>{{ point }}</span>
+                    </li>
+                  }
+                </ul>
+              }
 
-              @if (job.projects) {
+              @if (job.projects && job.projects.length > 0) {
                 <div class="mt-6 space-y-4">
                   <h4 class="text-xs font-bold uppercase tracking-widest text-neutral-500 opacity-0 translate-y-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-y-0 transition-all duration-500" [style.transition-delay]="'800ms'">Key Projects</h4>
                   @for (project of job.projects; track project.name; let pIdx = $index) {
@@ -65,7 +69,7 @@
                 </div>
               }
               
-              @if (job.recognition) {
+              @if (job.recognition && job.recognition.title) {
                 <div class="mt-6 relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-r from-amber-400 via-orange-500 to-red-500">
                   <div class="absolute inset-0 bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 opacity-20 blur-md"></div>
                   <div class="relative bg-neutral-900 rounded-2xl p-4 flex flex-col gap-2">
@@ -73,8 +77,12 @@
                       <svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L5.237 7.58l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 014 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L8 4.323V3a1 1 0 011-1zm-5.16 10.613l-.841 2.623a2.001 2.001 0 001.83 2.764 2.001 2.001 0 001.83-2.764l-.84-2.623a.999.999 0 01-1.979 0zM14.16 12.613l-.841 2.623a2.001 2.001 0 001.83 2.764 2.001 2.001 0 001.83-2.764l-.84-2.623a.999.999 0 01-1.979 0z" clip-rule="evenodd"></path></svg>
                       <span class="font-bold text-amber-500 uppercase tracking-wider text-xs">{{ job.recognition.title }}</span>
                     </div>
-                    <p class="text-sm text-neutral-300">{{ job.recognition.description }}</p>
-                    <span class="text-xs text-neutral-500 text-right">{{ job.recognition.date }}</span>
+                    @if (job.recognition.description) {
+                      <p class="text-sm text-neutral-300">{{ job.recognition.description }}</p>
+                    }
+                    @if (job.recognition.date) {
+                      <span class="text-xs text-neutral-500 text-right">{{ job.recognition.date }}</span>
+                    }
                   </div>
                 </div>
               }

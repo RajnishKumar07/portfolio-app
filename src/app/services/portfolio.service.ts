@@ -12,7 +12,7 @@ export class PortfolioService {
   constructor(private http: HttpClient) { }
 
   getPortfolio(slug: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${slug}`).pipe(
+    return this.http.get<any>(`${this.apiUrl}/${slug}`, { withCredentials: true }).pipe(
       map(res => res.data || res) // fallback if not wrapped
     );
   }

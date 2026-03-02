@@ -42,4 +42,16 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.currentUser() !== null;
   }
+
+  checkAuth(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      tap(res => {
+         this.currentUser.set(res.data || res);
+      }),
+      catchError(err => {
+         this.currentUser.set(null);
+         return of(null);
+      })
+    );
+  }
 }

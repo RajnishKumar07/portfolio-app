@@ -10,7 +10,7 @@ import { Projects } from '../projects/projects';
 import { Education } from '../education/education';
 import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 import { PortfolioService } from '../../services/portfolio.service';
-
+import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -36,7 +36,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private portfolioService: PortfolioService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -50,10 +51,13 @@ export class HomeComponent implements OnInit {
     this.portfolioData.set(null); // Reset while loading
     this.portfolioService.getPortfolio(slug).subscribe({
       next: (res) => {
-        // Assume interceptor/API wraps successful data in { data: ... }
-        this.portfolioData.set(res.data || res);
+        this.portfolioData.set(res);
       },
-      error: (err) => console.error('Failed to load portfolio', err)
+      error: (err) => {
+        console.error('Failed to load portfolio, it may be private or not exist.', err);
+        // Redirect to a safe fallback like the builder marketing site
+        this.router.navigate(['/']); 
+      }
     });
   }
 }

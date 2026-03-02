@@ -18,8 +18,10 @@ export interface Project {
   period?: string;
   role: string;
   description: string;
+  imagePath?: string;
   techStack: string[];
   features: string[];
+  tags?: string[];
   links: { label: string; url: string }[];
 }
 
@@ -27,6 +29,7 @@ export interface Education {
   degree: string;
   institution: string;
   period: string;
+  description?: string;
 }
 
 export interface Certification {

@@ -6,41 +6,69 @@
           <div class="h-px bg-gradient-to-r from-transparent to-indigo-500/50 w-12 md:w-24"></div>
           <h2 class="text-3xl md:text-5xl font-bold tracking-tight">Personal Projects</h2>
         </div>
-        <p class="text-neutral-400 max-w-2xl">A selection of my recent full-stack applications showcasing my ability to own products from concept to deployment.</p>
       </div>
-      <a [href]="'https://'+data().personalInfo.githubUrl" target="_blank" class="text-indigo-400 hover:text-white font-medium flex items-center gap-2 transition-colors">
-        View Github
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-      </a>
+      @if (data().personalInfo.githubUrl) {
+        <a [href]="data().personalInfo.githubUrl!.startsWith('http') ? data().personalInfo.githubUrl : 'https://' + data().personalInfo.githubUrl" target="_blank" class="text-indigo-400 hover:text-white font-medium flex items-center gap-2 transition-colors">
+          View Github
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+      }
     </div>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-12">
       @for (project of data().projects; track project.title; let idx = $index) {
         <div appScrollReveal class="group/card opacity-0 translate-y-12 [&.is-revealed]:opacity-100 [&.is-revealed]:translate-y-0 transition-all duration-1000 hover:duration-500 bg-[#111] border border-white/10 rounded-3xl p-10 flex flex-col min-h-full hover:-translate-y-3 group relative overflow-hidden shadow-lg hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.3)]"
              [style.transition-delay]="(idx * 200) + 'ms'">
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-colors duration-500"></div>
-          
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-colors duration-500 z-10"></div>
           <div class="relative z-10 flex flex-col h-full">
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-400/10 px-4 py-1.5 rounded-full">{{ project.role }}</span>
-              <span class="text-sm text-neutral-500 font-medium">{{ project.period }}</span>
+          
+          @if (project.imagePath) {
+            <div class="h-64 -mx-10 -mt-10 mb-8 relative overflow-hidden rounded-t-3xl border-b border-white/10 shrink-0">
+              <img [src]="project.imagePath" [alt]="project.title + ' Thumbnail'" 
+                   (error)="project.imagePath = ''"
+                   class="absolute inset-0 w-full h-full object-cover object-top opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">
+              <div class="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/40 to-transparent"></div>
             </div>
+          }
+          
+            @if (project.role || project.period) {
+              <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                @if (project.role) {
+                  <span class="text-xs font-bold uppercase tracking-widest text-indigo-400 bg-indigo-400/10 px-4 py-1.5 rounded-full">{{ project.role }}</span>
+                }
+                @if (project.period) {
+                  <span class="text-sm text-neutral-500 font-medium">{{ project.period }}</span>
+                }
+              </div>
+            }
+            
+            @if (project.tags && project.tags.length > 0) {
+              <div class="flex flex-wrap gap-2 mb-4">
+                @for (tag of project.tags; track tag) {
+                  <span class="px-2.5 py-1 bg-white/5 border border-white/10 rounded-md text-[10px] font-bold uppercase tracking-wider text-neutral-300">{{ tag }}</span>
+                }
+              </div>
+            }
             
             <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-400 group-hover:to-purple-400 transition-colors">{{ project.title }}</h3>
             
-            <p class="text-neutral-400 leading-relaxed mb-8 flex-grow">{{ project.description }}</p>
+            @if (project.description) {
+              <p class="text-neutral-400 leading-relaxed mb-8 flex-grow">{{ project.description }}</p>
+            }
             
-            <div class="mb-8">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3">Key Features</h4>
-              <ul class="space-y-2">
-                @for (feature of project.features; track feature; let fIdx = $index) {
-                  <li class="flex items-start text-neutral-300 text-sm opacity-0 translate-x-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-x-0 transition-all duration-500" [style.transition-delay]="(fIdx * 100 + 400) + 'ms'">
-                    <span class="mt-1.5 mr-3 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-500/50"></span>
-                    <span>{{ feature }}</span>
-                  </li>
-                }
-              </ul>
-            </div>
+            @if (project.features && project.features.length > 0) {
+              <div class="mb-8">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3">Key Features</h4>
+                <ul class="space-y-2">
+                  @for (feature of project.features; track feature; let fIdx = $index) {
+                    <li class="flex items-start text-neutral-300 text-sm opacity-0 translate-x-4 group-[.is-revealed]/card:opacity-100 group-[.is-revealed]/card:translate-x-0 transition-all duration-500" [style.transition-delay]="(fIdx * 100 + 400) + 'ms'">
+                      <span class="mt-1.5 mr-3 flex-shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-500/50"></span>
+                      <span>{{ feature }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
 
             <div class="flex flex-wrap gap-2 mb-8 mt-auto">
               @for (tech of project.techStack; track tech; let tIdx = $index) {
@@ -48,14 +76,16 @@
               }
             </div>
             
-            <div class="flex flex-wrap gap-4 pt-6 border-t border-white/10">
-              @for (link of project.links; track link.url) {
-                <a [href]="link.url" target="_blank" class="flex items-center text-sm font-bold text-white hover:text-indigo-400 transition-colors">
-                  {{ link.label }}
-                  <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                </a>
-              }
-            </div>
+            @if (project.links && project.links.length > 0) {
+              <div class="flex flex-wrap gap-4 pt-6 border-t border-white/10 mt-auto">
+                @for (link of project.links; track link.url) {
+                  <a [href]="link.url" target="_blank" class="flex items-center text-sm font-bold text-white hover:text-indigo-400 transition-colors">
+                    {{ link.label }}
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                  </a>
+                }
+              </div>
+            }
           </div>
         </div>
       }
