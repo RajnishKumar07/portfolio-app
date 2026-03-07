@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, Subject, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -8,6 +8,9 @@ import { environment } from '../../environments/environment';
 })
 export class PortfolioService {
   private apiUrl = `${environment.apiUrl}/portfolio`;
+  
+  // Emit event when portfolio list should be refreshed
+  public portfoliosUpdated$ = new Subject<void>();
 
   constructor(private http: HttpClient) { }
 
@@ -19,7 +22,8 @@ export class PortfolioService {
 
   createPortfolio(portfolioData: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, portfolioData, { withCredentials: true }).pipe(
-      map(res => res.data || res)
+      map(res => res.data || res),
+      tap(() => this.portfoliosUpdated$.next())
     );
   }
 
@@ -31,7 +35,8 @@ export class PortfolioService {
 
   updatePortfolio(slug: string, portfolioData: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${slug}`, portfolioData, { withCredentials: true }).pipe(
-      map(res => res.data || res)
+      map(res => res.data || res),
+      tap(() => this.portfoliosUpdated$.next())
     );
   }
 }

@@ -54,8 +54,8 @@ export interface SkillItem {
 export interface PersonalInfo {
   name: string;
   title: string;
-  role?: string;
   tagline?: string;
+  isAvailableForWork?: boolean;
   about: string;
   email: string;
   phone?: string;

@@ -97,9 +97,12 @@
               <label class="block text-sm font-medium text-neutral-300 mb-2">Tagline Focus</label>
               <input type="text" formControlName="tagline" placeholder="e.g. Architecting High-Performance Web Apps" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
             </div>
-            <div>
-              <label class="block text-sm font-medium text-neutral-300 mb-2">Functional Role (Optional)</label>
-              <input type="text" formControlName="role" placeholder="e.g. Fullstack Developer" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+            <div class="flex items-center mt-6 bg-white/5 p-4 rounded-xl border border-white/5">
+              <input id="isAvailableForWork" type="checkbox" formControlName="isAvailableForWork" class="w-5 h-5 text-teal-500 bg-neutral-800 border-neutral-700 rounded focus:ring-teal-500 focus:ring-2">
+              <label for="isAvailableForWork" class="ml-3 block text-sm font-medium text-white">
+                Available for work
+                <p class="text-neutral-400 font-normal mt-0.5">Show a hiring badge on your hero section.</p>
+              </label>
             </div>
             <div class="md:col-span-2">
               <label class="block text-sm font-medium text-neutral-300 mb-2">Professional Summary *</label>

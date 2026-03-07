@@ -1,5 +1,6 @@
-import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal, input } from '@angular/core';
+import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal, input, DestroyRef, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { interval } from 'rxjs';
 import { PortfolioData } from '../../core/models/portfolio.model';
 
 @Component({
@@ -14,6 +15,7 @@ export class Hero implements OnInit {
   displayTitle = signal('');
   fullTitle = '';
   scrolled = false;
+  destroyRef = inject(DestroyRef);
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -27,21 +29,25 @@ export class Hero implements OnInit {
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
     
-    // Dynamically set title from the API data instead of a static string
     const info = this.data().personalInfo;
-    this.fullTitle = info.role || (info.title.includes(' | ') ? info.title.split(' | ')[0] : info.title);
+    this.fullTitle = info.title;
     
     if (this.isBrowser) {
-        let i = 0;
-        const speed = 100;
-        const typeWriter = () => {
-          if (i < this.fullTitle.length) {
-            this.displayTitle.update(val => val + this.fullTitle.charAt(i));
-            i++;
-            setTimeout(typeWriter, speed);
-          }
-        };
-        setTimeout(typeWriter, 500); // initial delay
+        setTimeout(() => {
+          const titleChars = this.fullTitle.split('');
+          let currentStr = '';
+          
+          const sub = interval(100).subscribe(i => {
+            if (i < titleChars.length) {
+              currentStr += titleChars[i];
+              this.displayTitle.set(currentStr);
+            } else {
+              sub.unsubscribe();
+            }
+          });
+          
+          this.destroyRef.onDestroy(() => sub.unsubscribe());
+        }, 500);
     } else {
         this.displayTitle.set(this.fullTitle);
     }

@@ -45,6 +45,15 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.fetchPortfolios();
+
+    // Listen for new/updated portfolios and refresh the list
+    this.portfolioService.portfoliosUpdated$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.fetchPortfolios());
+  }
+
+  fetchPortfolios() {
     this.portfolioService.getUserPortfolios().subscribe({
       next: (portfolios) => this.userPortfolios.set(portfolios),
       error: (err) => console.error('Failed to fetch user portfolios', err)

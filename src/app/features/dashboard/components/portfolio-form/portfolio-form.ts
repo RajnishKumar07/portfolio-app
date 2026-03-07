@@ -54,8 +54,8 @@ export class PortfolioFormComponent implements OnInit {
       personalInfo: this.fb.group({
         name: ['', Validators.required],
         title: ['', Validators.required],
-        role: [''],
         tagline: [''],
+        isAvailableForWork: [true],
         about: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         phone: [''],

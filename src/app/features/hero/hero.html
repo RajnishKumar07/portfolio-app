@@ -6,13 +6,15 @@
   </div>
 
   <div class="max-w-5xl text-center z-10 relative">
-    <div class="inline-flex items-center px-4 py-2 border border-teal-500/30 bg-teal-500/10 rounded-full text-teal-400 text-sm font-medium tracking-wide mb-8 group overflow-hidden relative" title="Open to new opportunities">
-      <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-      <span class="w-2 h-2 bg-teal-400 rounded-full mr-3 shadow-[0_0_10px_rgba(45,212,191,1)] animate-ping relative before:absolute before:inset-[-2px] before:rounded-full before:bg-teal-400"></span>
-      Available for work
-    </div>
+    @if (data().personalInfo.isAvailableForWork) {
+      <div class="inline-flex items-center px-4 py-2 border border-teal-500/30 bg-teal-500/10 rounded-full text-teal-400 text-sm font-medium tracking-wide mb-8 group overflow-hidden relative" title="Open to new opportunities">
+        <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+        <span class="w-2 h-2 bg-teal-400 rounded-full mr-3 shadow-[0_0_10px_rgba(45,212,191,1)] animate-ping relative before:absolute before:inset-[-2px] before:rounded-full before:bg-teal-400"></span>
+        Available for work
+      </div>
+    }
     
-    <h1 class="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight mb-6">
+    <h1 class="text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight mb-2">
       Hello, I'm <br class="md:hidden">
       <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-purple-400 to-indigo-400 animate-gradient-x inline-block">
         {{ data().personalInfo.name }}
@@ -20,9 +22,9 @@
     </h1>
     
     <div class="h-10 md:h-12 flex justify-center items-center" [ngClass]="{'mb-10': !data().personalInfo.location, 'mb-6': data().personalInfo.location}">
-        <p class="text-xl md:text-3xl font-medium text-neutral-300 flex items-center h-full">
+        <p class="text-xl md:text-2xl font-medium text-teal-400 flex items-center h-full">
            <span class="inline-block transition-opacity duration-300 pr-1 border-r-[0.15em] border-teal-400" style="animation: blink-caret .75s step-end infinite;">
-             {{ data().personalInfo.role || displayTitle() }}
+             {{ displayTitle() }}
            </span>
         </p>
     </div>
@@ -34,9 +36,11 @@
       </div>
     }
     
-    <p class="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed mb-12">
-      {{ data().personalInfo.tagline || (data().personalInfo.title.includes(' | ') ? data().personalInfo.title.split(' | ')[1] : data().personalInfo.title) || 'Building scalable, pixel-perfect user experiences bridging the gap between elegant design and complex backend infrastructure.' }}
-    </p>
+    @if (data().personalInfo.tagline) {
+      <p class="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed mb-12">
+        {{ data().personalInfo.tagline }}
+      </p>
+    }
     
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 relative z-20">
       <a (click)="scrollTo('projects')" class="cursor-pointer w-full sm:w-auto px-8 py-4 bg-white text-black font-bold uppercase tracking-wider rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.8)] hover:-translate-y-1 transition-all duration-300">
