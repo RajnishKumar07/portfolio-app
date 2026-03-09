@@ -4,6 +4,7 @@ import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -14,8 +15,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard').then(m => m.DashboardComponent),
     canActivate: [authGuard],
     children: [
-      { path: '', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent) },
-      { path: 'edit/:slug', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent) }
+      { path: '', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent), canDeactivate: [unsavedChangesGuard] },
+      { path: 'edit/:slug', loadComponent: () => import('./features/dashboard/components/portfolio-form/portfolio-form').then(m => m.PortfolioFormComponent), canDeactivate: [unsavedChangesGuard] }
     ]
   },
   { path: 'p/:slug', component: HomeComponent }

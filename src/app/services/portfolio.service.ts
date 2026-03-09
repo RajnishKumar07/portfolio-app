@@ -39,4 +39,13 @@ export class PortfolioService {
       tap(() => this.portfoliosUpdated$.next())
     );
   }
+
+  uploadImage(file: File): Observable<{url: string}> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${environment.apiUrl}/upload/image`, formData, { withCredentials: true }).pipe(
+      map(res => res.data || res)
+    );
+  }
+
 }

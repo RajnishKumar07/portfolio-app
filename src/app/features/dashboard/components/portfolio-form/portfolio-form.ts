@@ -1,25 +1,44 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { PortfolioService } from '../../../../services/portfolio.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-portfolio-form',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DragDropModule],
   templateUrl: './portfolio-form.html',
   styleUrl: './portfolio-form.scss'
 })
 export class PortfolioFormComponent implements OnInit {
   portfolioForm!: FormGroup;
   isSaving = signal(false);
-  saveSuccess = signal(false);
-  errorMessage = signal('');
+  saveSuccess = signal<boolean>(false);
+  errorMessage = signal<string | null>(null);
+  
+  // Volatile frontend tracking has been replaced by the nightly Backend Cron Job ('CloudinaryAsset' table)
+  
+  isUploadingImage = signal<number | null>(null);
+  isUploadingResume = signal<boolean>(false);
 
   currentStep = signal(1);
   totalSteps = 7;
   editSlug: string | null = null;
   isLoading = signal(false);
+  
+  reorderModes = signal({
+    experiences: false,
+    educations: false,
+    projects: false,
+    skills: false,
+    certifications: false
+  });
+
+  toggleReorderMode(section: keyof ReturnType<typeof this.reorderModes>) {
+    this.reorderModes.update(m => ({ ...m, [section]: !m[section] }));
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -27,6 +46,20 @@ export class PortfolioFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router
   ) {}
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadNotification($event: BeforeUnloadEvent) {
+    if (!this.canDeactivate()) {
+      $event.preventDefault();
+      $event.returnValue = 'You have unsaved changes! Are you sure you want to leave?';
+      return 'You have unsaved changes! Are you sure you want to leave?';
+    }
+    return true;
+  }
+
+  canDeactivate(): boolean {
+    return !(this.portfolioForm?.dirty && !this.saveSuccess());
+  }
 
   ngOnInit() {
     this.initForm();
@@ -61,7 +94,8 @@ export class PortfolioFormComponent implements OnInit {
         phone: [''],
         location: [''],
         githubUrl: [''],
-        linkedinUrl: ['']
+        linkedinUrl: [''],
+        resumeUrl: ['']
       }),
       languages: this.fb.array([]),
       experiences: this.fb.array([]),
@@ -252,6 +286,94 @@ export class PortfolioFormComponent implements OnInit {
   nextStep() { if (this.currentStep() < this.totalSteps) this.currentStep.update(s => s + 1); }
   prevStep() { if (this.currentStep() > 1) this.currentStep.update(s => s - 1); }
 
+  drop(event: CdkDragDrop<string[]>, section: string) {
+    const array = this.portfolioForm.get(section) as FormArray;
+    if (array) {
+      if (typeof array.value[0] === 'string') {
+        const valueArray = [...array.value];
+        moveItemInArray(valueArray, event.previousIndex, event.currentIndex);
+        array.setValue(valueArray);
+      } else {
+        const dir = event.currentIndex > event.previousIndex ? 1 : -1;
+        const from = event.previousIndex;
+        const to = event.currentIndex;
+
+        const temp = array.at(from);
+        for (let i = from; i * dir < to * dir; i = i + dir) {
+          const current = array.at(i + dir);
+          array.setControl(i, current);
+        }
+        array.setControl(to, temp);
+      }
+      this.portfolioForm.markAsDirty();
+    }
+  }
+
+  dropNested(event: CdkDragDrop<any[]>, formArray: any) {
+    if (formArray instanceof FormArray) {
+      if (typeof formArray.value[0] === 'string') {
+        // Primitive arrays (like tags, text fields)
+        const valueArray = [...formArray.value];
+        moveItemInArray(valueArray, event.previousIndex, event.currentIndex);
+        formArray.setValue(valueArray);
+      } else {
+        // Object arrays (like objects in FormGroups)
+        const dir = event.currentIndex > event.previousIndex ? 1 : -1;
+        const from = event.previousIndex;
+        const to = event.currentIndex;
+
+        const temp = formArray.at(from);
+        for (let i = from; i * dir < to * dir; i = i + dir) {
+          const current = formArray.at(i + dir);
+          formArray.setControl(i, current);
+        }
+        formArray.setControl(to, temp);
+      }
+      this.portfolioForm.markAsDirty();
+    }
+  }
+
+  /* RESUME UPLOAD HANDLERS */
+  
+  async uploadResume(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      this.errorMessage.set('Only PDF files are supported for resumes.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB
+      this.errorMessage.set('Resume file must be less than 10MB.');
+      return;
+    }
+
+    this.isUploadingResume.set(true);
+    this.errorMessage.set(null);
+
+    try {
+      const response = await firstValueFrom(this.portfolioService.uploadImage(file));
+      if (response?.url) {
+        this.portfolioForm.get('personalInfo.resumeUrl')?.setValue(response.url);
+        this.portfolioForm.markAsDirty();
+      }
+    } catch (error: any) {
+      console.error('Resume upload error:', error);
+      this.errorMessage.set('Failed to upload resume. Please try again.');
+    } finally {
+      this.isUploadingResume.set(false);
+      (event.target as HTMLInputElement).value = '';
+    }
+  }
+
+  async removeResume() {
+     this.portfolioForm.get('personalInfo.resumeUrl')?.setValue('');
+     this.portfolioForm.markAsDirty();
+  }
+
+  /* FORM OVERALL SUBMIT */
+
   onSubmit() {
     if (this.portfolioForm.invalid) {
       this.errorMessage.set('Please fill out all required fields marked with *');
@@ -315,5 +437,36 @@ export class PortfolioFormComponent implements OnInit {
         setTimeout(() => this.errorMessage.set(''), 5000);
       }
     });
+  }
+
+  uploadProjectImage(event: Event, projectIndex: number) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    this.isUploadingImage.set(projectIndex);
+    this.errorMessage.set('');
+
+    this.portfolioService.uploadImage(file).subscribe({
+      next: (res) => {
+        const newUrl = res.url;
+        this.projects.at(projectIndex).patchValue({ imagePath: newUrl });
+        
+        this.isUploadingImage.set(null);
+        this.portfolioForm.markAsDirty();
+      },
+      error: (err) => {
+        this.errorMessage.set('Failed to upload image. Please try again.');
+        this.isUploadingImage.set(null);
+      }
+    });
+  }
+
+  removeProjectImage(projectIndex: number) {
+    const projectCtrl = this.projects.at(projectIndex);
+    const currentUrl = projectCtrl.get('imagePath')?.value;
+    if (!currentUrl) return;
+
+    projectCtrl.patchValue({ imagePath: '' });
+    this.portfolioForm.markAsDirty();
   }
 }

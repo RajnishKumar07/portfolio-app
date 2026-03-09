@@ -126,6 +126,28 @@
               <label class="block text-sm font-medium text-neutral-300 mb-2">LinkedIn URL</label>
               <input type="text" formControlName="linkedinUrl" class="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
             </div>
+            
+            <div class="md:col-span-2 text-xl font-bold pt-4 border-t border-white/5">Media & Documents</div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-neutral-300 mb-2">Resume (PDF or External URL)</label>
+              <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <input type="text" formControlName="resumeUrl" placeholder="https://... (Direct Link)" class="flex-1 w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-teal-500 focus:outline-none">
+                <span class="text-neutral-500 text-sm font-semibold hidden sm:inline">OR</span>
+                <label class="px-6 py-3 w-full sm:w-auto text-center bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 font-bold rounded-xl cursor-pointer transition-colors relative" [ngClass]="{'opacity-50 pointer-events-none': isUploadingResume()}">
+                  @if (isUploadingResume()) {
+                    Uploading...
+                  } @else {
+                    Upload PDF
+                  }
+                  <input type="file" class="hidden" (change)="uploadResume($event)" accept="application/pdf" [disabled]="isUploadingResume()">
+                </label>
+                @if (portfolioForm.get('personalInfo.resumeUrl')?.value) {
+                  <button type="button" (click)="removeResume()" class="px-6 py-3 w-full sm:w-auto text-center bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold rounded-xl cursor-pointer transition-colors" [disabled]="isUploadingResume()">
+                    Remove
+                  </button>
+                }
+              </div>
+            </div>
           </div>
 
           <div class="mt-6 pt-6 border-t border-white/5" [formGroup]="portfolioForm">
@@ -136,11 +158,17 @@
               </div>
               <button type="button" (click)="addLanguage()" class="text-xs font-bold px-3 py-1.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded-lg transition-colors">+ Add Language</button>
             </div>
-            <div formArrayName="languages" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'languages')" cdkDropListOrientation="mixed" formArrayName="languages" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 language-drop-list">
               @for (langCtrl of languages.controls; track langCtrl; let i = $index) {
-                <div class="flex gap-2 relative">
-                  <input type="text" [formControlName]="i" placeholder="e.g. English" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2.5 text-white focus:border-teal-500 focus:outline-none">
-                  <button type="button" (click)="removeLanguage(i)" class="p-2.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                <div cdkDrag cdkDragBoundary=".language-drop-list" class="flex gap-2 relative group bg-neutral-900/20 p-1.5 rounded-xl border border-white/5">
+                  <div *cdkDragPreview class="bg-neutral-800 p-3 rounded-xl shadow-xl border border-white/10 w-[200px] flex items-center justify-between">
+                    <span class="font-bold text-white text-sm">{{ languages.at(i).value || 'Language' }}</span>
+                  </div>
+                  <div class="cursor-grab active:cursor-grabbing px-2 text-neutral-600 hover:text-white transition-colors flex items-center" cdkDragHandle>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                  </div>
+                  <input type="text" [formControlName]="i" placeholder="e.g. English" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
+                  <button type="button" (click)="removeLanguage(i)" class="p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>
                 </div>
@@ -158,19 +186,41 @@
               <h3 class="text-xl font-bold text-white mb-1">Work Experience</h3>
               <p class="text-neutral-400 text-sm">Add your chronological work history.</p>
             </div>
-            <button type="button" (click)="addExperience()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Add Job
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="toggleReorderMode('experiences')" [class.bg-teal-500]="reorderModes().experiences" [class.text-black]="reorderModes().experiences" [class.bg-white]="!reorderModes().experiences" [class.text-white]="!reorderModes().experiences" class="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Reorder
+              </button>
+              <button type="button" (click)="addExperience()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Job
+              </button>
+            </div>
           </div>
 
-          @for (expCtrl of experiences.controls; track expCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
-              <button type="button" (click)="removeExperience(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          @if (reorderModes().experiences) {
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'experiences')" class="w-full space-y-2 exp-drop-list">
+              @for (expCtrl of experiences.controls; track expCtrl; let i = $index) {
+                <div cdkDrag cdkDragBoundary=".exp-drop-list" class="bg-black/40 border border-white/10 rounded-lg p-4 flex items-center justify-between group cursor-grab active:cursor-grabbing">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <div>
+                      <span class="font-bold text-white">{{ expCtrl.get('role')?.value || 'New Role' }}</span>
+                      <span class="text-sm text-neutral-400 ml-2">@ {{ expCtrl.get('company')?.value || 'Company' }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="w-full">
+              @for (expCtrl of experiences.controls; track expCtrl; let i = $index) {
+                <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
+                  <button type="button" (click)="removeExperience(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div>
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Role *</label>
                   <input type="text" formControlName="role" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
@@ -197,10 +247,12 @@
                     <label class="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">Key Responsibilities</label>
                     <button type="button" (click)="addExperienceResponsibility(i)" class="text-[11px] font-bold px-2 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Bullet</button>
                   </div>
-                  <div formArrayName="responsibilities" class="space-y-2">
+                  <div formArrayName="responsibilities" cdkDropList (cdkDropListDropped)="dropNested($event, expCtrl.get('responsibilities'))" class="space-y-2 resp-drop-list">
                     @for (respCtrl of $any(expCtrl.get('responsibilities')).controls; track respCtrl; let rIdx = $index) {
-                      <div class="flex items-center gap-2">
-                        <div class="text-neutral-500">•</div>
+                      <div cdkDrag cdkDragBoundary=".resp-drop-list" class="flex items-center gap-2">
+                        <div class="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-white" cdkDragHandle>
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </div>
                         <input type="text" [formControlName]="rIdx" placeholder="e.g. Led team of 5" class="flex-1 bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
                         <button type="button" (click)="removeExperienceResponsibility(i, rIdx)" class="p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -228,14 +280,16 @@
                             <input type="text" formControlName="tech" placeholder="Tech Stack (e.g. Node, React)" class="w-full bg-neutral-900 border border-white/10 rounded px-3 py-1.5 text-white text-sm focus:border-teal-500 focus:outline-none">
                           </div>
                         </div>
-                        <div formArrayName="points" class="space-y-2 mt-2 pl-2 border-l-2 border-white/5">
+                        <div formArrayName="points" cdkDropList (cdkDropListDropped)="dropNested($event, epCtrl.get('points'))" class="space-y-2 mt-2 pl-2 border-l-2 border-white/5 point-drop-list">
                           <div class="flex items-center justify-between mb-1">
                             <span class="text-[10px] text-neutral-500 uppercase tracking-wider">Bullet Points</span>
                             <button type="button" (click)="addExpProjectPoint(i, epIdx)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 rounded transition-colors">+ Add Point</button>
                           </div>
                           @for (ptCtrl of $any(epCtrl.get('points')).controls; track ptCtrl; let ptIdx = $index) {
-                            <div class="flex items-center gap-2">
-                              <span class="text-neutral-600">-</span>
+                            <div cdkDrag cdkDragBoundary=".point-drop-list" class="flex items-center gap-2">
+                              <div class="cursor-grab active:cursor-grabbing text-neutral-500 hover:text-white" cdkDragHandle>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                              </div>
                               <input type="text" [formControlName]="ptIdx" placeholder="Point details" class="flex-1 bg-neutral-900 border border-white/10 rounded px-2 py-1 text-white text-xs focus:border-teal-500 focus:outline-none">
                               <button type="button" (click)="removeExpProjectPoint(i, epIdx, ptIdx)" class="p-1 text-neutral-500 hover:text-red-400 bg-white/5 rounded"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                             </div>
@@ -256,20 +310,19 @@
                     <div>
                       <input type="text" formControlName="title" placeholder="Award Title (e.g. Employee of the Month)" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
                     </div>
-                    <div>
-                      <input type="text" formControlName="date" placeholder="Date (e.g. Sep 2023)" class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
-                    </div>
                     <div class="md:col-span-2">
                       <input type="text" formControlName="description" placeholder="Brief description of the recognition..." class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-amber-500 focus:outline-none">
+                    </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          }
-        </div>
-      }
+            }
+          </div>
 
+        }
+      </div>
+    }
       <!-- STEP 4: Education -->
       @if (currentStep() === 4) {
         <div class="space-y-6 animate-fade-in" formArrayName="educations">
@@ -277,19 +330,41 @@
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Education</h3>
             </div>
-            <button type="button" (click)="addEducation()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Add School
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="toggleReorderMode('educations')" [class.bg-teal-500]="reorderModes().educations" [class.text-black]="reorderModes().educations" [class.bg-white]="!reorderModes().educations" [class.text-white]="!reorderModes().educations" class="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Reorder
+              </button>
+              <button type="button" (click)="addEducation()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add School
+              </button>
+            </div>
           </div>
 
-          @for (eduCtrl of educations.controls; track eduCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
-              <button type="button" (click)="removeEducation(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          @if (reorderModes().educations) {
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'educations')" class="w-full space-y-2 edu-drop-list">
+              @for (eduCtrl of educations.controls; track eduCtrl; let i = $index) {
+                <div cdkDrag cdkDragBoundary=".edu-drop-list" class="bg-black/40 border border-white/10 rounded-lg p-4 flex items-center justify-between group cursor-grab active:cursor-grabbing">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <div>
+                      <span class="font-bold text-white">{{ eduCtrl.get('institution')?.value || 'New School' }}</span>
+                      <span class="text-sm text-neutral-400 ml-2">@ {{ eduCtrl.get('degree')?.value || 'Degree' }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="w-full">
+              @for (eduCtrl of educations.controls; track eduCtrl; let i = $index) {
+                <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
+                  <button type="button" (click)="removeEducation(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div>
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Degree *</label>
                   <input type="text" formControlName="degree" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
@@ -306,7 +381,9 @@
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Extracurriculars/Description *</label>
                   <textarea formControlName="description" rows="2" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none scrollbar-custom"></textarea>
                 </div>
+                </div>
               </div>
+            }
             </div>
           }
         </div>
@@ -319,19 +396,37 @@
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Featured Projects</h3>
             </div>
-            <button type="button" (click)="addProject()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Add Project
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="toggleReorderMode('projects')" [class.bg-teal-500]="reorderModes().projects" [class.text-black]="reorderModes().projects" [class.bg-white]="!reorderModes().projects" [class.text-white]="!reorderModes().projects" class="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Reorder
+              </button>
+              <button type="button" (click)="addProject()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Project
+              </button>
+            </div>
           </div>
 
-          @for (projCtrl of projects.controls; track projCtrl; let i = $index) {
-            <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
-              <button type="button" (click)="removeProject(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 z-10">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-              </button>
-              
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          @if (reorderModes().projects) {
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'projects')" class="w-full space-y-2 proj-drop-list">
+              @for (projCtrl of projects.controls; track projCtrl; let i = $index) {
+                <div cdkDrag cdkDragBoundary=".proj-drop-list" class="bg-black/40 border border-white/10 rounded-lg p-4 flex items-center justify-between group cursor-grab active:cursor-grabbing">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="font-bold text-white">{{ projCtrl.get('title')?.value || 'New Project' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="w-full">
+              @for (projCtrl of projects.controls; track projCtrl; let i = $index) {
+                <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-6 relative group mb-4">
+                  <button type="button" (click)="removeProject(i)" class="absolute top-4 right-4 p-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100 z-10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                  </button>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
                 <div class="md:col-span-2">
                   <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Project Title *</label>
                   <input type="text" formControlName="title" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
@@ -355,10 +450,13 @@
                     <label class="block text-[10px] font-semibold text-neutral-400 uppercase tracking-wider">Key Features</label>
                     <button type="button" (click)="addProjectFeature(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Feature</button>
                   </div>
-                  <div formArrayName="features" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div formArrayName="features" cdkDropList (cdkDropListDropped)="dropNested($event, projCtrl.get('features'))" class="grid grid-cols-1 sm:grid-cols-2 gap-2 feat-drop-list">
                     @for (featCtrl of $any(projCtrl.get('features')).controls; track featCtrl; let featIdx = $index) {
-                      <div class="flex gap-1.5">
-                        <input type="text" [formControlName]="featIdx" placeholder="e.g. Real-time chat" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                      <div cdkDrag cdkDragBoundary=".feat-drop-list" class="flex gap-1.5 items-center bg-black/50 border border-white/10 rounded pr-1 overflow-hidden">
+                        <div class="cursor-grab active:cursor-grabbing px-2 text-neutral-500 hover:text-white flex items-center bg-white/5 self-stretch border-r border-white/5" cdkDragHandle>
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </div>
+                        <input type="text" [formControlName]="featIdx" placeholder="e.g. Real-time chat" class="flex-1 bg-transparent px-2 py-1.5 text-white text-xs focus:outline-none">
                         <button type="button" (click)="removeProjectFeature(i, featIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                       </div>
                     }
@@ -372,10 +470,13 @@
                     <button type="button" (click)="addProjectTech(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Tech</button>
                   </div>
                   <p class="text-[10px] text-neutral-500 mb-3 leading-tight">Tools & languages used (e.g., Angular, Node.js).</p>
-                  <div formArrayName="techStack" class="space-y-1.5">
+                  <div formArrayName="techStack" cdkDropList (cdkDropListDropped)="dropNested($event, projCtrl.get('techStack'))" class="space-y-1.5 tech-drop-list">
                     @for (techCtrl of $any(projCtrl.get('techStack')).controls; track techCtrl; let techIdx = $index) {
-                      <div class="flex gap-1.5">
-                        <input type="text" [formControlName]="techIdx" placeholder="React" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                      <div cdkDrag cdkDragBoundary=".tech-drop-list" class="flex gap-1.5 items-center bg-black/50 border border-white/10 rounded pr-1 overflow-hidden">
+                        <div class="cursor-grab active:cursor-grabbing px-2 text-neutral-500 hover:text-white flex items-center bg-white/5 self-stretch border-r border-white/5" cdkDragHandle>
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </div>
+                        <input type="text" [formControlName]="techIdx" placeholder="React" class="flex-1 bg-transparent px-2 py-1.5 text-white text-xs focus:outline-none">
                         <button type="button" (click)="removeProjectTech(i, techIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                       </div>
                     }
@@ -389,10 +490,13 @@
                     <button type="button" (click)="addProjectTag(i)" class="text-[10px] font-bold px-1.5 py-0.5 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Tag</button>
                   </div>
                   <p class="text-[10px] text-neutral-500 mb-3 leading-tight">Context labels for the project (e.g., Open Source, Featured).</p>
-                  <div formArrayName="tags" class="space-y-1.5">
+                  <div formArrayName="tags" cdkDropList (cdkDropListDropped)="dropNested($event, projCtrl.get('tags'))" class="space-y-1.5 tag-drop-list">
                     @for (tagCtrl of $any(projCtrl.get('tags')).controls; track tagCtrl; let tagIdx = $index) {
-                      <div class="flex gap-1.5">
-                        <input type="text" [formControlName]="tagIdx" placeholder="Featured" class="flex-1 bg-black/50 border border-white/10 rounded px-2 py-1.5 text-white text-xs focus:border-teal-500 focus:outline-none">
+                      <div cdkDrag cdkDragBoundary=".tag-drop-list" class="flex gap-1.5 items-center bg-black/50 border border-white/10 rounded pr-1 overflow-hidden">
+                        <div class="cursor-grab active:cursor-grabbing px-2 text-neutral-500 hover:text-white flex items-center bg-white/5 self-stretch border-r border-white/5" cdkDragHandle>
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </div>
+                        <input type="text" [formControlName]="tagIdx" placeholder="Featured" class="flex-1 bg-transparent px-2 py-1.5 text-white text-xs focus:outline-none">
                         <button type="button" (click)="removeProjectTag(i, tagIdx)" class="px-2 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                       </div>
                     }
@@ -400,14 +504,28 @@
                 </div>
 
                 <div class="md:col-span-2">
-                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Thumbnail Image (URL)</label>
-                  <input type="text" formControlName="imagePath" placeholder="https://..." class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Thumbnail Image</label>
+                  <div class="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <input type="text" formControlName="imagePath" placeholder="https://... (URL)" class="flex-1 w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
+                    <span class="text-neutral-500 text-xs font-semibold hidden sm:inline">OR</span>
+                    <label class="px-4 py-2 w-full sm:w-auto text-center bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 font-bold text-sm rounded-lg cursor-pointer transition-colors relative" [ngClass]="{'opacity-50 pointer-events-none': isUploadingImage() === i}">
+                      @if (isUploadingImage() === i) {
+                        Uploading...
+                      } @else {
+                        Upload File
+                      }
+                      <input type="file" (change)="uploadProjectImage($event, i)" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" [disabled]="isUploadingImage() === i">
+                    </label>
+                    @if (projCtrl.get('imagePath')?.value) {
+                      <button type="button" (click)="removeProjectImage(i)" class="px-4 py-2 w-full sm:w-auto text-center bg-red-500/10 text-red-400 hover:bg-red-500/20 font-bold text-sm rounded-lg cursor-pointer transition-colors">
+                        Remove Image
+                      </button>
+                    }
+                  </div>
                 </div>
-                <div class="md:col-span-2">
-                  <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Live Link (Optional)</label>
-                  <input type="text" formControlName="link" placeholder="https://myapp.com" class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white focus:border-teal-500 focus:outline-none">
                 </div>
               </div>
+              }
             </div>
           }
         </div>
@@ -421,16 +539,34 @@
               <h3 class="text-xl font-bold text-white mb-1">Technical Skills</h3>
               <p class="text-neutral-400 text-sm">Group your skills into categories.</p>
             </div>
-            <button type="button" (click)="addSkillCategory()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Add Category
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="toggleReorderMode('skills')" [class.bg-teal-500]="reorderModes().skills" [class.text-black]="reorderModes().skills" [class.bg-white]="!reorderModes().skills" [class.text-white]="!reorderModes().skills" class="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Reorder
+              </button>
+              <button type="button" (click)="addSkillCategory()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Category
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @for (skillCtrl of skills.controls; track skillCtrl; let i = $index) {
-              <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 relative group">
-                <button type="button" (click)="removeSkillCategory(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100 z-10">
+          @if (reorderModes().skills) {
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'skills')" class="w-full space-y-2 skills-drop-list">
+              @for (skillCtrl of skills.controls; track skillCtrl; let i = $index) {
+                <div cdkDrag cdkDragBoundary=".skills-drop-list" class="bg-black/40 border border-white/10 rounded-lg p-4 flex items-center justify-between group cursor-grab active:cursor-grabbing">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="font-bold text-white">{{ skillCtrl.get('category')?.value || 'New Category' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (skillCtrl of skills.controls; track skillCtrl; let i = $index) {
+                <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 relative group">
+                  <button type="button" (click)="removeSkillCategory(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100 z-10">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 
@@ -444,9 +580,12 @@
                       <label class="block text-xs font-semibold text-neutral-300 uppercase tracking-wider">Items</label>
                       <button type="button" (click)="addSkillItem(i)" class="text-[10px] font-bold px-2 py-1 bg-teal-500/10 text-teal-400 hover:bg-teal-500/20 rounded transition-colors">+ Add Item</button>
                     </div>
-                    <div formArrayName="items" class="flex flex-wrap gap-2">
+                    <div formArrayName="items" cdkDropList (cdkDropListDropped)="dropNested($event, skillCtrl.get('items'))" cdkDropListOrientation="mixed" class="flex flex-wrap gap-2 skill-item-drop-list">
                       @for (itemCtrl of $any(skillCtrl.get('items')).controls; track itemCtrl; let itemIdx = $index) {
-                        <div class="flex items-center gap-1 bg-black/60 border border-white/10 rounded-full pl-3 pr-1 py-1">
+                        <div cdkDrag cdkDragBoundary=".skill-item-drop-list" class="flex items-center gap-1 bg-black/60 border border-white/10 rounded-full pl-1 pr-1 py-1">
+                          <div class="cursor-grab active:cursor-grabbing pl-2 pr-1 text-neutral-500 hover:text-white flex items-center" cdkDragHandle>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 9h8M8 15h8" stroke-width="2" stroke-linecap="round"/></svg>
+                          </div>
                           <input type="text" [formControlName]="itemIdx" placeholder="Skill" class="w-20 sm:w-24 bg-transparent text-white text-xs focus:outline-none">
                           <button type="button" (click)="removeSkillItem(i, itemIdx)" class="p-1 text-neutral-400 hover:text-red-400 hover:bg-white/10 rounded-full transition-colors"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
                         </div>
@@ -456,7 +595,8 @@
                 </div>
               </div>
             }
-          </div>
+            </div>
+          }
         </div>
       }
       <!-- STEP 7: Certifications -->
@@ -467,18 +607,36 @@
               <h3 class="text-xl font-bold text-white mb-1">Certifications</h3>
               <p class="text-neutral-400 text-sm">Add your professional certifications and awards.</p>
             </div>
-            <button type="button" (click)="addCertification()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-              Add Certification
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" (click)="toggleReorderMode('certifications')" [class.bg-teal-500]="reorderModes().certifications" [class.text-black]="reorderModes().certifications" [class.bg-white]="!reorderModes().certifications" [class.text-white]="!reorderModes().certifications" class="px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors">
+                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                Reorder
+              </button>
+              <button type="button" (click)="addCertification()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Add Certification
+              </button>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @for (certCtrl of certifications.controls; track certCtrl; let i = $index) {
-              <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 relative group">
-                <button type="button" (click)="removeCertification(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100">
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+          @if (reorderModes().certifications) {
+            <div cdkDropList (cdkDropListDropped)="drop($event, 'certifications')" class="w-full space-y-2 cert-drop-list">
+              @for (certCtrl of certifications.controls; track certCtrl; let i = $index) {
+                <div cdkDrag cdkDragBoundary=".cert-drop-list" class="bg-black/40 border border-white/10 rounded-lg p-4 flex items-center justify-between group cursor-grab active:cursor-grabbing">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-neutral-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <span class="font-bold text-white">{{ certCtrl.get('title')?.value || 'New Certification' }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              @for (certCtrl of certifications.controls; track certCtrl; let i = $index) {
+                <div [formGroupName]="i" class="bg-black/30 border border-white/5 rounded-xl p-5 pt-8 relative group">
+                  <button type="button" (click)="removeCertification(i)" class="absolute top-3 right-3 p-1.5 text-neutral-500 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-md transition-colors opacity-0 group-hover:opacity-100 z-10">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                  </button>
                 
                 <div class="space-y-4">
                   <div>
@@ -489,10 +647,11 @@
                     <label class="block text-xs font-semibold text-neutral-400 mb-1 uppercase tracking-wider">Credential URL *</label>
                     <input type="text" formControlName="url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:border-teal-500 focus:outline-none">
                   </div>
-                </div>
-              </div>
-            }
-          </div>
+                   </div>
+                  </div>
+              }
+            </div>
+          }
         </div>
       }
     </div>

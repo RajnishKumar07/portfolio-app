@@ -62,6 +62,7 @@ export interface PersonalInfo {
   location?: string;
   linkedinUrl?: string;
   githubUrl?: string;
+  resumeUrl?: string;
 }
 
 export interface PortfolioData {
