@@ -12,6 +12,7 @@ import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.dir
 import { PortfolioService } from '../../services/portfolio.service';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
+import { PortfolioData } from '../../core/models/portfolio.model';
 
 @Component({
   selector: 'app-home',
@@ -30,9 +31,14 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
+/**
+ * Primary Smart / Container Component for the public-facing application.
+ * Retrieves data from `PortfolioService` and strategically drills it down 
+ * into to all child presentational components (Hero, About, Experience, etc.) via Signals.
+ */
 export class HomeComponent implements OnInit {
   // The loaded portfolio data. Null while loading.
-  portfolioData = signal<any>(null);
+  portfolioData = signal<PortfolioData | null>(null);
 
   constructor(
     private portfolioService: PortfolioService,
@@ -47,6 +53,10 @@ export class HomeComponent implements OnInit {
     });
   }
 
+  /**
+   * Fetches the dynamic portfolio configuration driven by the URL slug.
+   * On failure (missing or private portfolio), forcibly redirects back to the builder/root.
+   */
   loadPortfolio(slug: string) {
     this.portfolioData.set(null); // Reset while loading
     this.portfolioService.getPortfolio(slug).subscribe({

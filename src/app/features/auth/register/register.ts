@@ -4,6 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
+/**
+ * Presentational and Container component for User Registration.
+ * Handles form validation (password constraints, confirmation matching) 
+ * and automatically logs the user in upon successful DB creation.
+ */
 @Component({
   selector: 'app-register',
   imports: [CommonModule, FormsModule, RouterModule],
@@ -21,27 +26,15 @@ export class RegisterComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    if (!this.email() || !this.password() || !this.confirmPassword()) {
-      this.errorMessage.set('Please fill out all fields');
-      return;
-    }
-
-    if (this.password() !== this.confirmPassword()) {
-      this.errorMessage.set('Passwords do not match');
-      return;
-    }
-
-    if (this.password().length < 6) {
-      this.errorMessage.set('Password must be at least 6 characters');
-      return;
-    }
+    if (!this.runValidations()) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
 
     this.authService.register({ email: this.email(), password: this.password() }).subscribe({
       next: () => {
-        // Automatically log them in after a successful registration
+        // Automatically pivot and perform a live login using the verified credentials upon a successful DB write,
+        // saving the user from having to manually sign in immediately after registering.
         this.authService.login({ email: this.email(), password: this.password() }).subscribe({
           next: () => {
             this.isLoading.set(false);
@@ -59,5 +52,34 @@ export class RegisterComponent {
         this.errorMessage.set(err.error?.message || 'Failed to register account. User may already exist.');
       }
     });
+  }
+
+  /**
+   * Executes form validations in a strict sequence, breaking out early
+   * and populating the error signal if any fail.
+   */
+  private runValidations(): boolean {
+    if (this.hasEmptyFields()) return false;
+    if (this.password() !== this.confirmPassword()) {
+      this.errorMessage.set('Passwords do not match');
+      return false;
+    }
+    if (this.password().length < 6) {
+      this.errorMessage.set('Password must be at least 6 characters');
+      return false;
+    }
+    return true;
+  }
+
+  private hasEmptyFields(): boolean {
+    if (!this.email()) {
+      this.errorMessage.set('Please fill out all fields');
+      return true;
+    }
+    if (!this.password() || !this.confirmPassword()) {
+      this.errorMessage.set('Please fill out all fields');
+      return true;
+    }
+    return false;
   }
 }

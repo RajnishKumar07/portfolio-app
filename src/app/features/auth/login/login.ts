@@ -5,6 +5,11 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { FormsModule } from '@angular/forms';
 
+/**
+ * Presentational and Container component for User Login.
+ * Handles the authentication form state and interfaces with `AuthService` 
+ * to securely log the user in and persist the HTTP-Only cookie session.
+ */
 @Component({
   selector: 'app-login',
   imports: [CommonModule, FormsModule, RouterModule],
@@ -29,6 +34,8 @@ export class LoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set('');
 
+    // Dispatch credentials to the backend. The backend will respond with a securely signed HTTP-Only cookie,
+    // seamlessly bypassing the need for the frontend to manually manage local storage tokens.
     this.authService.login({ email: this.email(), password: this.password() }).subscribe({
       next: () => {
         this.isLoading.set(false);

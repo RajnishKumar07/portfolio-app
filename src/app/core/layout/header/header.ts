@@ -2,6 +2,11 @@ import { Component, signal, HostListener, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioData } from '../../models/portfolio.model';
 
+/**
+ * Global Navigation Header Component.
+ * Implements sticky scrolling, dynamic active state highlighting based on 
+ * viewport position, and smooth-scrolling anchor links.
+ */
 @Component({
   selector: 'app-header',
   imports: [CommonModule],
@@ -15,29 +20,39 @@ export class Header {
 
   private sections = ['hero', 'about', 'experience', 'skills', 'projects', 'education'];
 
+  /**
+   * Tracks user scroll position to toggle the sticky CSS class and determine
+   * which section is currently active for navigation highlighting.
+   */
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.scrolled.set(window.scrollY > 50);
+    const active = this.calculateActiveSection();
+    this.activeSection.set(active);
+  }
 
-    // Find the current active section
+  /**
+   * Determines the active section by evaluating scroll position limits.
+   */
+  private calculateActiveSection(): string {
+    if (window.scrollY < 100) return 'hero';
+    
     let current = 'hero';
     for (const section of this.sections) {
-      const element = document.getElementById(section);
-      if (element) {
-        // Trigger slightly before reaching the exact section
-        const rect = element.getBoundingClientRect();
-        if (rect.top <= 150) {
-          current = section;
-        }
-      }
+      current = this.evaluateSectionPosition(section, current);
     }
-    
-    // Default to hero if at very top
-    if (window.scrollY < 100) {
-      current = 'hero';
-    }
+    return current;
+  }
 
-    this.activeSection.set(current);
+  /**
+   * Evaluates if a specific section's anchor threshold has breached the viewport buffer.
+   */
+  private evaluateSectionPosition(section: string, fallback: string): string {
+    const element = document.getElementById(section);
+    if (element && element.getBoundingClientRect().top <= 150) {
+      return section;
+    }
+    return fallback;
   }
 
   scrollTo(sectionId: string) {

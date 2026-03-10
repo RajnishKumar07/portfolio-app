@@ -5,7 +5,13 @@ import { AuthService } from '../../services/auth.service';
 import { PortfolioService } from '../../services/portfolio.service';
 import { filter } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { PortfolioData } from '../../core/models/portfolio.model';
 
+/**
+ * Primary Authenticated Layout and Dashboard Shell.
+ * Responsible for rendering the user's Portfolio List in the sidebar,
+ * handling global authenticated navigation, and managing the active edit view slug.
+ */
 @Component({
   selector: 'app-dashboard',
   imports: [CommonModule, RouterModule],
@@ -14,7 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class DashboardComponent implements OnInit {
   isSidebarOpen = signal(true);
-  userPortfolios = signal<any[]>([]);
+  userPortfolios = signal<PortfolioData[]>([]);
   activeSlug = signal<string | null>(null);
   private destroyRef = inject(DestroyRef);
 
@@ -24,9 +30,9 @@ export class DashboardComponent implements OnInit {
     private portfolioService: PortfolioService
   ) {
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd),
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef)
-    ).subscribe((event: any) => {
+    ).subscribe((event) => {
       const url = event.urlAfterRedirects || event.url;
       const match = url.match(/\/dashboard\/edit\/([^\/]+)/);
       if (match && match[1]) {

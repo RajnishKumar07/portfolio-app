@@ -3,6 +3,11 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { interval } from 'rxjs';
 import { PortfolioData } from '../../core/models/portfolio.model';
 
+/**
+ * Presentational Hero Component.
+ * Serves as the primary landing header for the Portfolio. 
+ * Features a typewriter-style animation (`interval`) for the job title string.
+ */
 @Component({
   selector: 'app-hero',
   imports: [CommonModule],
@@ -26,6 +31,11 @@ export class Hero implements OnInit {
     }
   }
   
+  /**
+   * Initializes the typewriter animation effect for the title.
+   * Leverages Angular `interval` observables and ensures cleanup via `DestroyRef` 
+   * to strictly prevent browser memory leaks on navigation.
+   */
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
     
