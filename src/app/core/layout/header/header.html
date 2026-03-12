@@ -5,9 +5,9 @@
     'bg-transparent py-6': !scrolled()
   }"
 >
-  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
-    <a href="#" class="text-2xl font-extrabold tracking-tighter cursor-pointer">
-      Rajnish <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400">Kumar</span>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4">
+    <a href="#" class="text-xl sm:text-2xl font-extrabold tracking-tighter cursor-pointer truncate max-w-[180px] sm:max-w-xs md:max-w-sm">
+      {{ firstName() }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400">{{ lastName() }}</span>
     </a>
     
     <nav class="hidden md:flex gap-8">
@@ -23,8 +23,8 @@
          [ngClass]="activeSection() === 'education' ? 'text-white' : 'text-neutral-400 hover:text-white'">Education</a>
     </nav>
     
-    <a [href]="'mailto:' + data().personalInfo.email" class="px-4 py-2 sm:px-6 sm:py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full font-medium transition-all duration-300 text-xs sm:text-sm whitespace-nowrap">
+    <button (click)="contactClick.emit()" class="px-5 py-2 sm:px-6 sm:py-2.5 bg-teal-500 hover:bg-teal-400 text-white shadow-[0_0_15px_rgba(45,212,191,0.3)] hover:shadow-[0_0_25px_rgba(45,212,191,0.6)] rounded-full font-bold tracking-wider transition-all duration-300 text-xs sm:text-sm whitespace-nowrap hover:-translate-y-0.5 uppercase">
       Let's Talk
-    </a>
+    </button>
   </div>
 </header>

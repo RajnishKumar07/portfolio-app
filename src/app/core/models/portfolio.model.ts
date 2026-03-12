@@ -72,6 +72,7 @@ export interface PersonalInfo {
 }
 
 export interface PortfolioData {
+  userId?: string;
   slug: string;
   isPublic: boolean;
   metrics: Metric[];

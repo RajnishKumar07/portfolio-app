@@ -1,4 +1,4 @@
-import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal, input, DestroyRef, inject } from '@angular/core';
+import { Component, PLATFORM_ID, Inject, OnInit, HostListener, signal, input, DestroyRef, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { interval } from 'rxjs';
 import { PortfolioData } from '../../core/models/portfolio.model';
@@ -19,15 +19,17 @@ export class Hero implements OnInit {
   isBrowser = false;
   displayTitle = signal('');
   fullTitle = '';
-  scrolled = false;
+  scrolled = signal(false);
   destroyRef = inject(DestroyRef);
   
+  @Output() contactClick = new EventEmitter<void>();
+
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
     if (this.isBrowser) {
-      this.scrolled = window.scrollY > 50;
+      this.scrolled.set(window.scrollY > 50);
     }
   }
   

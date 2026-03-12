@@ -19,19 +19,42 @@ export class RegisterComponent {
   email = signal('');
   password = signal('');
   confirmPassword = signal('');
+  otp = signal('');
   
+  step = signal<1 | 2>(1);
   isLoading = signal(false);
   errorMessage = signal('');
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  onSubmit() {
+  requestOtp() {
     if (!this.runValidations()) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
 
-    this.authService.register({ email: this.email(), password: this.password() }).subscribe({
+    this.authService.sendOtp(this.email(), 'REGISTER').subscribe({
+      next: () => {
+        this.isLoading.set(false);
+        this.step.set(2);
+      },
+      error: (err) => {
+        this.isLoading.set(false);
+        this.errorMessage.set(err.error?.message || 'Failed to send OTP. Email may already exist.');
+      }
+    });
+  }
+
+  onSubmit() {
+    if (this.otp().trim().length < 6) {
+      this.errorMessage.set('Please enter the 6-digit OTP sent to your email.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+
+    this.authService.register({ email: this.email(), password: this.password(), otp: this.otp() }).subscribe({
       next: () => {
         // Automatically pivot and perform a live login using the verified credentials upon a successful DB write,
         // saving the user from having to manually sign in immediately after registering.
@@ -49,7 +72,7 @@ export class RegisterComponent {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.error?.message || 'Failed to register account. User may already exist.');
+        this.errorMessage.set(err.error?.message || 'Invalid or expired OTP code.');
       }
     });
   }

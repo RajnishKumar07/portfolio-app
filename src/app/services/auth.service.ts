@@ -4,13 +4,14 @@ import { Observable, tap, catchError, of, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AuthResponse {
-  id: string;
+  userId: string;
   email: string;
 }
 
 export interface RegisterPayload {
   email: string;
   password?: string;
+  otp?: string;
   name?: string;
   [key: string]: string | undefined;
 }
@@ -35,6 +36,14 @@ export class AuthService {
   currentUser = signal<AuthResponse | null>(null);
   
   constructor(private http: HttpClient) {}
+
+  sendOtp(email: string, type: 'REGISTER' | 'RESET_PASSWORD'): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/send-otp`, { email, type });
+  }
+
+  resetPassword(payload: any): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, payload);
+  }
 
   register(data: RegisterPayload): Observable<{ message: string; user: AuthResponse }> {
     return this.http.post<{ message: string; user: AuthResponse }>(`${this.apiUrl}/register`, data);

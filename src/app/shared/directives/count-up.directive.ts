@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
+import { Directive, ElementRef, input, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
 @Directive({
@@ -6,10 +6,10 @@ import { isPlatformBrowser } from '@angular/common';
   standalone: true
 })
 export class CountUpDirective implements OnInit, OnDestroy {
-  @Input('appCountUp') targetValue: number = 0;
-  @Input() duration: number = 2000;
-  @Input() suffix: string = '';
-  @Input() delay: number = 0;
+  appCountUp = input<number>(0);
+  duration = input<number>(2000);
+  suffix = input<string>('');
+  delay = input<number>(0);
 
   private observer: IntersectionObserver | null = null;
   private hasAnimated = false;
@@ -22,13 +22,13 @@ export class CountUpDirective implements OnInit, OnDestroy {
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       // Initialize with 0
-      this.el.nativeElement.textContent = `0${this.suffix}`;
+      this.el.nativeElement.textContent = `0${this.suffix()}`;
 
       this.observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting && !this.hasAnimated) {
             this.hasAnimated = true;
-            setTimeout(() => this.animateCountUp(), this.delay);
+            setTimeout(() => this.animateCountUp(), this.delay());
             if (this.observer) this.observer.unobserve(this.el.nativeElement);
           }
         });
@@ -37,7 +37,7 @@ export class CountUpDirective implements OnInit, OnDestroy {
       this.observer.observe(this.el.nativeElement);
     } else {
       // Server-side rendering fallback
-      this.el.nativeElement.textContent = `${this.targetValue}${this.suffix}`;
+      this.el.nativeElement.textContent = `${this.appCountUp()}${this.suffix()}`;
     }
   }
 
@@ -45,18 +45,18 @@ export class CountUpDirective implements OnInit, OnDestroy {
     let startTimestamp: number | null = null;
     const step = (timestamp: number) => {
       if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / this.duration, 1);
+      const progress = Math.min((timestamp - startTimestamp) / this.duration(), 1);
       
       // Easing function (easeOutExpo)
       const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      const currentVal = Math.floor(easeProgress * this.targetValue);
+      const currentVal = Math.floor(easeProgress * this.appCountUp());
       
-      this.el.nativeElement.textContent = `${currentVal}${this.suffix}`;
+      this.el.nativeElement.textContent = `${currentVal}${this.suffix()}`;
       
       if (progress < 1) {
         window.requestAnimationFrame(step);
       } else {
-        this.el.nativeElement.textContent = `${this.targetValue}${this.suffix}`;
+        this.el.nativeElement.textContent = `${this.appCountUp()}${this.suffix()}`;
       }
     };
     window.requestAnimationFrame(step);

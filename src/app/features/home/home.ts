@@ -1,4 +1,4 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Header } from '../../core/layout/header/header';
 import { Footer } from '../../core/layout/footer/footer';
@@ -10,14 +10,16 @@ import { Projects } from '../projects/projects';
 import { Education } from '../education/education';
 import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 import { PortfolioService } from '../../services/portfolio.service';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { PortfolioData } from '../../core/models/portfolio.model';
+import { ContactModalComponent } from '../../shared/components/contact-modal.component';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
   imports: [
     CommonModule,
+    RouterLink,
     Header,
     Hero,
     About,
@@ -27,6 +29,7 @@ import { PortfolioData } from '../../core/models/portfolio.model';
     Education,
     Footer,
     ScrollRevealDirective,
+    ContactModalComponent,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss'
@@ -39,16 +42,29 @@ import { PortfolioData } from '../../core/models/portfolio.model';
 export class HomeComponent implements OnInit {
   // The loaded portfolio data. Null while loading.
   portfolioData = signal<PortfolioData | null>(null);
+  
+  isContactModalOpen = signal(false);
+  currentSlug = signal('');
 
   constructor(
     private portfolioService: PortfolioService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
+
+  /** True when the logged-in user owns the currently shown portfolio. */
+  isOwner = computed(() => {
+    const user = this.authService.currentUser();
+    const portfolio = this.portfolioData();
+    if (!user || !portfolio?.userId) return false;
+    return user.userId === portfolio.userId;
+  });
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug') || 'default-slug';
+      this.currentSlug.set(slug);
       this.loadPortfolio(slug);
     });
   }
@@ -69,5 +85,13 @@ export class HomeComponent implements OnInit {
         this.router.navigate(['/']); 
       }
     });
+  }
+
+  openContactModal() {
+    this.isContactModalOpen.set(true);
+  }
+
+  closeContactModal() {
+    this.isContactModalOpen.set(false);
   }
 }

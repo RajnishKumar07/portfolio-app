@@ -2,8 +2,8 @@
   
   <!-- Sidebar Navigation -->
   <aside 
-    class="bg-neutral-900 border-r border-white/5 transition-all duration-300 flex flex-col relative z-20"
-    [ngClass]="isSidebarOpen() ? 'w-64' : 'w-20'">
+    class="bg-neutral-900 border-r border-white/5 transition-all duration-300 flex flex-col absolute md:relative z-50 h-full left-0 top-0"
+    [ngClass]="isSidebarOpen() ? 'w-64 translate-x-0' : 'w-64 -translate-x-full md:w-20 md:translate-x-0'">
     
     <div class="h-16 flex items-center justify-between px-4 border-b border-white/5">
       @if (isSidebarOpen()) {
@@ -65,8 +65,20 @@
     <!-- Subtle Background Elements -->
     <div class="absolute top-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none"></div>
 
-    <header class="h-16 flex items-center px-8 border-b border-white/5 bg-neutral-900/50 backdrop-blur-md relative z-10 justify-between">
-      <h1 class="text-lg font-bold text-white tracking-wide">Builder Dashboard</h1>
+    <!-- Overlay for mobile when sidebar is open -->
+    @if (isSidebarOpen()) {
+      <div class="fixed inset-0 bg-black/50 z-40 md:hidden" (click)="toggleSidebar()"></div>
+    }
+
+    <header class="h-16 flex items-center px-4 md:px-8 border-b border-white/5 bg-neutral-900/50 backdrop-blur-md relative z-10 justify-between">
+      <div class="flex items-center gap-3">
+        <button (click)="toggleSidebar()" class="md:hidden p-2 hover:bg-white/5 rounded-lg text-neutral-400 hover:text-white transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <h1 class="text-lg font-bold text-white tracking-wide truncate">Builder Dashboard</h1>
+      </div>
       <div class="flex gap-4">
         <a [routerLink]="activeSlug() ? ['/p', activeSlug()] : null" 
            [class.opacity-50]="!activeSlug()"

@@ -1,6 +1,6 @@
 <div class="w-full h-full relative">
 <!-- Stepper Header -->
-  <div class="flex items-center justify-between mb-8 overflow-x-auto pb-4 scrollbar-none border-b border-white/5">
+  <div class="flex items-center justify-between mb-8 overflow-x-auto pb-4 scrollbar-custom border-b border-white/5">
     @for (step of ['Settings', 'Personal', 'Experience', 'Education', 'Projects', 'Skills', 'Certifications']; track step; let idx = $index) {
       <div class="flex flex-col items-center gap-2 relative px-4 flex-shrink-0 cursor-pointer" 
            (click)="currentStep.set(idx + 1)"
@@ -195,7 +195,7 @@
           Any deep `[formGroupName]="i"` mappings inside will properly resolve to the array iterations.
         -->
         <div class="space-y-6 animate-fade-in" formArrayName="experiences">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Work Experience</h3>
               <p class="text-neutral-400 text-sm">Add your chronological work history.</p>
@@ -345,7 +345,7 @@
       <!-- STEP 4: Education -->
       @if (currentStep() === 4) {
         <div class="space-y-6 animate-fade-in" formArrayName="educations">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Education</h3>
             </div>
@@ -411,7 +411,7 @@
       <!-- STEP 5: Projects -->
       @if (currentStep() === 5) {
         <div class="space-y-6 animate-fade-in" formArrayName="projects">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Featured Projects</h3>
             </div>
@@ -557,7 +557,7 @@
       <!-- STEP 6: Skills -->
       @if (currentStep() === 6) {
         <div class="space-y-6 animate-fade-in" formArrayName="skills">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Technical Skills</h3>
               <p class="text-neutral-400 text-sm">Group your skills into categories.</p>
@@ -625,7 +625,7 @@
       <!-- STEP 7: Certifications -->
       @if (currentStep() === 7) {
         <div class="space-y-6 animate-fade-in" formArrayName="certifications">
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-xl font-bold text-white mb-1">Certifications</h3>
               <p class="text-neutral-400 text-sm">Add your professional certifications and awards.</p>
@@ -680,20 +680,20 @@
     </div>
 
     <!-- Stepper Footer Controls -->
-    <div class="pt-8 mt-8 border-t border-white/5 flex items-center justify-between">
+    <div class="pt-8 mt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row items-center justify-between gap-4">
       <button type="button" (click)="prevStep()" [disabled]="currentStep() === 1" 
-              class="px-6 py-2.5 rounded-xl font-bold bg-white/5 text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold bg-white/5 text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
         Back
       </button>
 
       @if (currentStep() < totalSteps) {
         <button type="button" (click)="nextStep()" 
-                class="px-6 py-2.5 rounded-xl font-bold bg-white text-black hover:bg-neutral-200 transition-colors">
+                class="w-full sm:w-auto px-6 py-2.5 rounded-xl font-bold bg-white text-black hover:bg-neutral-200 transition-colors">
           Next Step
         </button>
       } @else {
         <button type="submit" [disabled]="isSaving()"
-                class="px-8 py-2.5 rounded-xl font-bold bg-gradient-to-r from-teal-500 to-indigo-500 text-white hover:shadow-[0_0_20px_rgba(45,212,191,0.4)] transition-all flex items-center gap-2">
+                class="w-full sm:w-auto px-8 py-2.5 rounded-xl font-bold bg-gradient-to-r from-teal-500 to-indigo-500 text-white hover:shadow-[0_0_20px_rgba(45,212,191,0.4)] transition-all flex items-center justify-center gap-2">
           @if (isSaving()) {
              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

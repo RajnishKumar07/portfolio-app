@@ -1,4 +1,4 @@
-import { Component, signal, HostListener, input } from '@angular/core';
+import { Component, signal, HostListener, input, Output, EventEmitter, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioData } from '../../models/portfolio.model';
 
@@ -15,8 +15,20 @@ import { PortfolioData } from '../../models/portfolio.model';
 })
 export class Header {
   data = input.required<PortfolioData>();
+  @Output() contactClick = new EventEmitter<void>();
   scrolled = signal(false);
   activeSection = signal('hero');
+
+  firstName = computed(() => {
+    const name = this.data()?.personalInfo?.name || 'Your Name';
+    return name.split(' ')[0] || '';
+  });
+  
+  lastName = computed(() => {
+    const name = this.data()?.personalInfo?.name || 'Your Name';
+    const parts = name.split(' ');
+    return parts.length > 1 ? parts.slice(1).join(' ') : '';
+  });
 
   private sections = ['hero', 'about', 'experience', 'skills', 'projects', 'education'];
 
