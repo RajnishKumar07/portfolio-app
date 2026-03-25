@@ -1,6 +1,7 @@
 import { Component, signal, HostListener, input, Output, EventEmitter, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PortfolioData } from '../../models/portfolio.model';
+import { RouterLink } from '@angular/router';
 
 /**
  * Global Navigation Header Component.
@@ -9,7 +10,7 @@ import { PortfolioData } from '../../models/portfolio.model';
  */
 @Component({
   selector: 'app-header',
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
